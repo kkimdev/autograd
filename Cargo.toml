@@ -1,0 +1,9 @@
+[package]
+name = "autograd"
+version = "0.0.1"
+authors = ["Kibeom Kim <kk1674@nyu.edu>"]
+
+[[bin]]
+name = "autograd-bin"
+test = false
+doc = false
