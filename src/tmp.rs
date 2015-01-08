@@ -250,3 +250,13 @@
 //         AutogradFloat{x: rhs.x.add(self), tape: None, tape_index: 0,}
 //     }
 // }
+
+
+    // impl <T: std::num::Float> Tape<T> {
+    //     fn new(size: usize) -> Tape<T> {
+    //         Tape{recorded_variables_count: 0,
+    //              adjoints: Vec::with_capacity(size),
+    //              lhs_indices: Vec::with_capacity(size),
+    //              rhs_indices: Vec::with_capacity(size),
+    //              result_derivatives: None,}
+    //     }
