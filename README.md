@@ -1,3 +1,6 @@
+# Warning
+This library is under development and not ready to use yet.
+
 # Autograd
 Rust automatic differentiation library computing gradient values. It is mainly for nonlinear optimization and machine learning.
 
