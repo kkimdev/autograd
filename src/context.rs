@@ -91,10 +91,6 @@ pub trait Context<T: std::num::Float>: std::marker::Sized {
         lhs_index
     }
 
-    // TODO the Option arguments and above std::marker::Sized are
-    // a hack due to the Rust compiler's limitation.
-    // This should be possible ideally. http://is.gd/QelquA
-    // TODO just return raw memory instead of vector?
     fn get_recorded_variables_count<'a>() -> &'a mut usize;
     fn get_recorded_entries_count<'a>() -> &'a mut usize;
     fn get_adjoints<'a>() -> &'a mut*mut T;
