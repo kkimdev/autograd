@@ -24,6 +24,7 @@ pub trait Context<T>: std::marker::Sized where T: std::num::Float {
     }
 
     fn differentiate(&self, float: super::float::Float<T, Self>) {
+        // TODO The current implementation is not performant and dirty.
         unsafe {
             // let count = <Self as Context<T>>::get_recorded_variables_count();
             *<Self as Context<T>>::get_result_derivatives().offset(super::float::float_get_index(&float) as isize) = std::num::Float::one();
