@@ -10,7 +10,7 @@ extern crate std;
 
 // TODO #[inline] where appropriate.
 
-pub trait Context<T: std::num::Float>: std::marker::Sized {
+pub trait Context<T>: std::marker::Sized where T: std::num::Float {
     // public functions
 
     fn new() -> Self {

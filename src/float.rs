@@ -5,7 +5,7 @@
 extern crate std;
 
 #[derive(Clone)]
-pub struct Float<T: std::num::Float, CT: super::context::Context<T>> {
+pub struct Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     pub value: T,
     index: usize,
 }
@@ -21,7 +21,7 @@ pub struct Float<T: std::num::Float, CT: super::context::Context<T>> {
 // impl <T: std::num::Float, CT: super::context::Context<T>> std::num::Float for Float<T, CT> {
 // }
 
-impl <T: std::num::Float, CT: super::context::Context<T>> std::num::ToPrimitive for Float<T, CT> {
+impl <T, CT> std::num::ToPrimitive for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     fn to_i64(&self) -> Option<i64> { self.value.to_i64() }
 
     fn to_u64(&self) -> Option<u64> { self.value.to_u64() }
@@ -32,7 +32,7 @@ impl <T: std::num::Float, CT: super::context::Context<T>> std::num::ToPrimitive 
 // impl <T: std::num::Float, CT: super::context::Context<T>> std::num::NumCast for Float<T, CT> {
 // }
 
-impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Neg for Float<T, CT> {
+impl <T, CT> std::ops::Neg for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     type Output = Float<T, CT>;
     fn neg(self) -> Float<T, CT> {
         // TODO rust doesn't have T::one() yet.
@@ -43,8 +43,7 @@ impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Neg for Floa
 }
 
 // TODO adjoints of 1 can be optimized out, i.e., not multiplying. Should we?
-impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Add<Float<T, CT>> for
- Float<T, CT> {
+impl <T, CT> std::ops::Add<Float<T, CT>> for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     type Output = Float<T, CT>;
     fn add(self, rhs: Float<T, CT>) -> Float<T, CT> {
         Float{value: self.value + rhs.value,
@@ -54,8 +53,7 @@ impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Add<Float<T,
     }
 }
 
-impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Sub<Float<T, CT>> for
- Float<T, CT> {
+impl <T, CT> std::ops::Sub<Float<T, CT>> for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     type Output = Float<T, CT>;
     fn sub(self, rhs: Float<T, CT>) -> Float<T, CT> {
         let one: T = std::num::Float::one();
@@ -66,8 +64,7 @@ impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Sub<Float<T,
     }
 }
 
-impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Mul<Float<T, CT>> for
- Float<T, CT> {
+impl <T, CT> std::ops::Mul<Float<T, CT>> for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     type Output = Float<T, CT>;
     fn mul(self, rhs: Float<T, CT>) -> Float<T, CT> {
         Float{value: self.value * rhs.value,
@@ -77,8 +74,7 @@ impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Mul<Float<T,
     }
 }
 
-impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Div<Float<T, CT>> for
- Float<T, CT> {
+impl <T, CT> std::ops::Div<Float<T, CT>> for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     type Output = Float<T, CT>;
     fn div(self, rhs: Float<T, CT>) -> Float<T, CT> {
         Float{value: self.value / rhs.value,
@@ -90,8 +86,7 @@ impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Div<Float<T,
 
 // TODO 1. Does it make sense to support % operator between two Floats ?
 //      2. If so, should we record rhs even though the multiplier is 0?
-impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Rem<Float<T, CT>> for
- Float<T, CT> {
+impl <T, CT> std::ops::Rem<Float<T, CT>> for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     type Output = Float<T, CT>;
     fn rem(self, rhs: Float<T, CT>) -> Float<T, CT> {
         // TODO add this kind of assert everywhere.
@@ -105,25 +100,25 @@ impl <T: std::num::Float, CT: super::context::Context<T>> std::ops::Rem<Float<T,
     }
 }
 
-impl <T: std::num::Float, CT: super::context::Context<T>> std::cmp::PartialEq for Float<T, CT> {
+impl <T, CT> std::cmp::PartialEq for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     fn eq(&self, other: &Float<T, CT>) -> bool { self.value == other.value }
 }
 
-impl <T: std::num::Float, CT: super::context::Context<T>> std::cmp::PartialOrd for Float<T, CT> {
+impl <T, CT> std::cmp::PartialOrd for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     fn partial_cmp(&self, other: &Float<T, CT>) -> Option<std::cmp::Ordering> {
         self.value.partial_cmp(&other.value)
     }
 }
 
-impl <T: std::num::Float, CT: super::context::Context<T>> std::marker::Copy for Float<T, CT> {}
+impl <T, CT> std::marker::Copy for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
+}
 
 // Crate private functions
 
-pub fn float_new<T: std::num::Float, CT: super::context::Context<T>>(value: T,
-                                         index: usize) -> Float<T, CT> {
+pub fn float_new<T, CT>(value: T, index: usize) -> Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     Float{value: value, index: index,}
 }
 
-pub fn float_get_index<T: std::num::Float, CT: super::context::Context<T>>(float: &Float<T, CT>) -> usize {
+pub fn float_get_index<T, CT>(float: &Float<T, CT>) -> usize where T: std::num::Float, CT: super::context::Context<T> {
     float.index
 }
