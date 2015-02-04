@@ -10,12 +10,12 @@
 #![crate_type = "rlib"]
 #![feature(thread_local)]
 
-pub use context::Context;
-pub use context::ContextImpl;
-pub use float::Float;
-
 mod context;
 mod float;
 
 #[cfg(test)]
 mod tests;
+
+pub use context::Context;
+pub use context::ContextImpl;
+pub use float::Float;
