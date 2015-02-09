@@ -8,13 +8,15 @@
 
 extern crate std;
 
+use super::float::FloatCratePrivate;
+
 // TODO #[inline] where appropriate.
 
 pub trait Context<T>: std::marker::Sized where T: std::num::Float {
     // public functions
 
     fn new_variable(&self, value: T) -> super::float::Float<T, Self> {
-        super::float::float_new(value, <Self as Context<T>>::get_new_variable_index())
+        FloatCratePrivate::new(value, <Self as Context<T>>::get_new_variable_index())
     }
 
     fn differentiate(&self, float: super::float::Float<T, Self>) {
@@ -26,7 +28,7 @@ pub trait Context<T>: std::marker::Sized where T: std::num::Float {
                 *<Self as Context<T>>::get_result_derivatives().offset(i as isize) = std::num::Float::zero();
             }
 
-            *<Self as Context<T>>::get_result_derivatives().offset(super::float::float_get_index(&float) as isize) = std::num::Float::one();
+            *<Self as Context<T>>::get_result_derivatives().offset(float.float_get_index() as isize) = std::num::Float::one();
             for i in (0..(*<Self as Context<T>>::get_recorded_entries_count())).rev() {
                 let lhs_index = *<Self as Context<T>>::get_lhs_indices().offset(i as isize);
                 let rhs_index = *<Self as Context<T>>::get_rhs_indices().offset(i as isize);
@@ -41,13 +43,14 @@ pub trait Context<T>: std::marker::Sized where T: std::num::Float {
     }
 
     fn get_derivative(&self, float: super::float::Float<T, Self>) -> T {
-        let float_index_offset = super::float::float_get_index(&float) as isize;
+        let float_index_offset = float.float_get_index() as isize;
         unsafe {
             *<Self as Context<T>>::get_result_derivatives().offset(float_index_offset)
         }
     }
 
     // Crate private functions
+    // TODO Move private functions to a seperate trait.
 
     fn get_new_variable_index() -> usize {
         let count = <Self as Context<T>>::get_recorded_variables_count();

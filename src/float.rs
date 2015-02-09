@@ -115,14 +115,17 @@ impl <T, CT> std::marker::Copy for Float<T, CT> where T: std::num::Float, CT: su
 
 // Crate private functions
 
-// TODO Put crate private functions in the private trait.
-// trait FloatPrivate<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
-// }
-
-pub fn float_new<T, CT>(value: T, index: usize) -> Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
-    Float{value: value, index: index,}
+pub trait FloatCratePrivate<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
+    fn new(value: T, index: usize) ->Self;
+    fn float_get_index(&self) -> usize;
 }
 
-pub fn float_get_index<T, CT>(float: &Float<T, CT>) -> usize where T: std::num::Float, CT: super::context::Context<T> {
-    float.index
+impl <T, CT> FloatCratePrivate<T, CT> for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
+    fn new(value: T, index: usize) -> Self {
+        Float{value: value, index: index}
+    }
+
+    fn float_get_index(&self) -> usize {
+        self.index
+    }
 }
