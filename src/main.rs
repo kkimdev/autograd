@@ -1,36 +1,11 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/* Any copyright is dedicated to the Public Domain.
+ * http://creativecommons.org/publicdomain/zero/1.0/ */
 
-// #![feature(thread_local)]
-//
-// extern crate autograd;
-//
-// trait Trait: std::marker::Sized {
-//
-// }
-//
-// struct Struct;
-//
-// impl Trait for Struct {
-// }
-//
-// impl std::ops::Drop for Struct {
-//     fn drop(&mut self) {
-//         println!("dropped");
-//     }
-// }
-//
-// fn main() {
-//     let s = Struct;
-//     let t : Trait = s;
-//
-// }
-
+#[macro_use]
+extern crate autograd;
+use autograd::Context;
 
 fn main() {
-    let x = 10;
-    for i in (0..x).rev() {
-        println!("{}", i);
-    }
+    let context = new_autograd_context!(f32, 1000);
+    let x1 = context.new_variable(1.5);
 }

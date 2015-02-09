@@ -17,5 +17,4 @@ mod float;
 mod tests;
 
 pub use context::Context;
-pub use context::ContextImpl;
 pub use float::Float;

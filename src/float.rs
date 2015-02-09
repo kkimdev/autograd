@@ -115,6 +115,10 @@ impl <T, CT> std::marker::Copy for Float<T, CT> where T: std::num::Float, CT: su
 
 // Crate private functions
 
+// TODO Put crate private functions in the private trait.
+// trait FloatPrivate<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
+// }
+
 pub fn float_new<T, CT>(value: T, index: usize) -> Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     Float{value: value, index: index,}
 }
