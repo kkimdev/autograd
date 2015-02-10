@@ -10,13 +10,6 @@ pub struct Float<T, CT> where T: std::num::Float, CT: super::context::Context<T>
     index: usize,
 }
 
-// TODO Remove this. as value bing public, we don't need anymore.
-// impl <T: std::num::Float, CT: super::context::Context<T>> Float<T, CT> {
-//     pub fn get_value(&self) -> T {
-//         self.value
-//     }
-// }
-
 // TODO implement std::num::Float
 // impl <T: std::num::Float, CT: super::context::Context<T>> std::num::Float for Float<T, CT> {
 // }
