@@ -6,6 +6,19 @@ extern crate autograd;
 use autograd::Context;
 
 #[test]
+fn negative() {
+    let context = new_autograd_context!(f32, 1000);
+    let x = context.new_variable(1.5);
+
+    let y = -x;
+    assert_eq!(y.value, -1.5);
+
+    context.differentiate(y);
+    assert_eq!(context.get_derivative(x), -1.);
+    assert_eq!(context.get_derivative(y), 1.);
+}
+
+#[test]
 fn addition() {
     let context = new_autograd_context!(f32, 1000);
     let x1 = context.new_variable(1.5);
@@ -15,9 +28,9 @@ fn addition() {
     assert_eq!(y.value, 4.);
 
     context.differentiate(y);
-    assert_eq!(context.get_derivative(y), 1.);
     assert_eq!(context.get_derivative(x1), 1.);
     assert_eq!(context.get_derivative(x2), 1.);
+    assert_eq!(context.get_derivative(y), 1.);
 }
 
 #[test]
@@ -30,9 +43,9 @@ fn multiplication() {
     assert_eq!(y.value, 3.75);
 
     context.differentiate(y);
-    assert_eq!(context.get_derivative(y), 1.);
     assert_eq!(context.get_derivative(x1), 2.5);
     assert_eq!(context.get_derivative(x2), 1.5);
+    assert_eq!(context.get_derivative(y), 1.);
 }
 
 #[test]
