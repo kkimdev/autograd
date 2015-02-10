@@ -68,3 +68,10 @@ fn context_lock() {
     }
     recursive_context(2);
 }
+
+#[test]
+fn context_capacity_expression_argument() {
+    let a = 200;
+    let b = 10;
+    let context = new_autograd_context!(f32, a/b);
+}

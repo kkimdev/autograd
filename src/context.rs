@@ -110,7 +110,8 @@ macro_rules! new_autograd_context {
     ($T:ty, $capacity:expr) => (
         {
             struct ContextImpl {
-                mutex_guard: std::sync::MutexGuard<'static ()>
+                capacity: usize,
+                mutex_guard: std::sync::MutexGuard<'static ()>,
             }
 
             impl $crate::Context<$T> for ContextImpl {
@@ -160,21 +161,21 @@ macro_rules! new_autograd_context {
             }
 
             impl ContextImpl {
-                fn new() -> Self {
+                fn new(capacity: usize) -> Self {
                     let context;
 
                     #[thread_local]
                     static LOCK : std::sync::StaticMutex = std::sync::MUTEX_INIT;
                     match LOCK.try_lock() {
-                        Ok(guard) => context = ContextImpl{mutex_guard: guard},
+                        Ok(guard) => context = ContextImpl{capacity: capacity, mutex_guard: guard},
                         Err(std::sync::TryLockError::WouldBlock) => panic!("This Context instance is in use now. Note that a Context instance is allowed per construction location and per thread. Consequently, it cannot be recursively constructed unless it is destructed. This is a limitation caused by the thread local static variables usages in the current implementation."),
                         Err(std::sync::TryLockError::Poisoned(poison_error)) => panic!("{:?}", poison_error),
                     }
 
                     // TODO use checked_mul?
                     //      example : let usize_size = capacity.checked_mul(std::mem::size_of::<usize>()).expect("capacity overflow");
-                    let usize_size = $capacity * std::mem::size_of::<usize>();
-                    let T_size = $capacity * std::mem::size_of::<$T>();
+                    let usize_size = capacity * std::mem::size_of::<usize>();
+                    let T_size = capacity * std::mem::size_of::<$T>();
                     // std::rt::heap::allocate(T_size, mem::min_align_of::<T>())
 
                     unsafe {
@@ -196,8 +197,8 @@ macro_rules! new_autograd_context {
                     // *Context::<$T>::get_adjoints(None::<Self>) = 0;
                     // TODO implement.
 
-                    let usize_size = $capacity * std::mem::size_of::<usize>();
-                    let T_size = $capacity * std::mem::size_of::<$T>();
+                    let usize_size = self.capacity * std::mem::size_of::<usize>();
+                    let T_size = self.capacity * std::mem::size_of::<$T>();
 
                     unsafe {
                         std::rt::heap::deallocate(*<Self as $crate::Context<$T>>::get_adjoints() as *mut u8, T_size, std::mem::align_of::<$T>());
@@ -208,7 +209,7 @@ macro_rules! new_autograd_context {
                 }
             }
 
-            ContextImpl::new()
+            ContextImpl::new($capacity)
         }
-    );
+    )
 }
