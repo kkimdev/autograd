@@ -12,11 +12,11 @@ use super::float::FloatCratePrivate;
 
 // TODO #[inline] where appropriate.
 
-pub trait Context<T>: std::marker::Sized where T: std::num::Float {
+pub trait Context<T>: ContextCratePrivate<T> + std::marker::Sized where T: std::num::Float {
     // public functions
 
     fn new_variable(&self, value: T) -> super::float::Float<T, Self> {
-        FloatCratePrivate::new(value, <Self as Context<T>>::get_new_variable_index())
+        FloatCratePrivate::new(value, <Self as ContextModulePrivate<T>>::get_new_variable_index())
     }
 
     fn differentiate(&self, float: super::float::Float<T, Self>) {
@@ -24,20 +24,20 @@ pub trait Context<T>: std::marker::Sized where T: std::num::Float {
         // TODO The current implementation is not performant and dirty.
         unsafe {
             // let count = <Self as Context<T>>::get_recorded_variables_count();
-            for i in (0..(*<Self as Context<T>>::get_recorded_variables_count())) {
-                *<Self as Context<T>>::get_result_derivatives().offset(i as isize) = std::num::Float::zero();
+            for i in (0..(*<Self as ContextModulePrivate<T>>::get_recorded_variables_count())) {
+                *<Self as ContextModulePrivate<T>>::get_result_derivatives().offset(i as isize) = std::num::Float::zero();
             }
 
-            *<Self as Context<T>>::get_result_derivatives().offset(float.float_get_index() as isize) = std::num::Float::one();
-            for i in (0..(*<Self as Context<T>>::get_recorded_entries_count())).rev() {
-                let lhs_index = *<Self as Context<T>>::get_lhs_indices().offset(i as isize);
-                let rhs_index = *<Self as Context<T>>::get_rhs_indices().offset(i as isize);
-                *<Self as Context<T>>::get_result_derivatives().offset(rhs_index as isize) =
-                    *<Self as Context<T>>::get_result_derivatives().offset(rhs_index as isize)
-                    + (*<Self as Context<T>>::get_result_derivatives().offset(lhs_index as isize)
-                       * *<Self as Context<T>>::get_adjoints().offset(i as isize));
+            *<Self as ContextModulePrivate<T>>::get_result_derivatives().offset(float.float_get_index() as isize) = std::num::Float::one();
+            for i in (0..(*<Self as ContextModulePrivate<T>>::get_recorded_entries_count())).rev() {
+                let lhs_index = *<Self as ContextModulePrivate<T>>::get_lhs_indices().offset(i as isize);
+                let rhs_index = *<Self as ContextModulePrivate<T>>::get_rhs_indices().offset(i as isize);
+                *<Self as ContextModulePrivate<T>>::get_result_derivatives().offset(rhs_index as isize) =
+                    *<Self as ContextModulePrivate<T>>::get_result_derivatives().offset(rhs_index as isize)
+                    + (*<Self as ContextModulePrivate<T>>::get_result_derivatives().offset(lhs_index as isize)
+                       * *<Self as ContextModulePrivate<T>>::get_adjoints().offset(i as isize));
 
-                let t = *<Self as Context<T>>::get_result_derivatives().offset(i as isize);
+                let t = *<Self as ContextModulePrivate<T>>::get_result_derivatives().offset(i as isize);
             }
         }
     }
@@ -45,55 +45,56 @@ pub trait Context<T>: std::marker::Sized where T: std::num::Float {
     fn get_derivative(&self, float: super::float::Float<T, Self>) -> T {
         let float_index_offset = float.float_get_index() as isize;
         unsafe {
-            *<Self as Context<T>>::get_result_derivatives().offset(float_index_offset)
+            *<Self as ContextModulePrivate<T>>::get_result_derivatives().offset(float_index_offset)
         }
     }
+}
 
-    // Crate private functions
-    // TODO Move private functions to a seperate trait.
-
-    fn get_new_variable_index() -> usize {
-        let count = <Self as Context<T>>::get_recorded_variables_count();
-        let index = *count;
-        *count += 1;
-        index
-    }
-
-    fn get_new_entry_index() -> usize {
-        let count = <Self as Context<T>>::get_recorded_entries_count();
-        let index = *count;
-        *count += 1;
-        index
-    }
-
+pub trait ContextCratePrivate<T>: ContextModulePrivate<T> where T: std::num::Float {
     fn unary_operation(adjoint: T, rhs_index: usize) -> usize {
-        let lhs_index = <Self as Context<T>>::get_new_variable_index();
-        let recorded_entries_count_offset = <Self as Context<T>>::get_new_entry_index() as isize;
+        let lhs_index = <Self as ContextModulePrivate<T>>::get_new_variable_index();
+        let recorded_entries_count_offset = <Self as ContextModulePrivate<T>>::get_new_entry_index() as isize;
         unsafe {
-            *<Self as Context<T>>::get_adjoints().offset(recorded_entries_count_offset) = adjoint;
-            *<Self as Context<T>>::get_lhs_indices().offset(recorded_entries_count_offset) = lhs_index;
-            *<Self as Context<T>>::get_rhs_indices().offset(recorded_entries_count_offset) = rhs_index;
+            *<Self as ContextModulePrivate<T>>::get_adjoints().offset(recorded_entries_count_offset) = adjoint;
+            *<Self as ContextModulePrivate<T>>::get_lhs_indices().offset(recorded_entries_count_offset) = lhs_index;
+            *<Self as ContextModulePrivate<T>>::get_rhs_indices().offset(recorded_entries_count_offset) = rhs_index;
         }
         lhs_index
     }
 
     fn binary_operation(adjoints: &[T; 2],
                         rhs_indices: &[usize; 2]) -> usize {
-        let lhs_index = <Self as Context<T>>::get_new_variable_index();
-        let recorded_entries_count_offset_1 = <Self as Context<T>>::get_new_entry_index() as isize;
-        let recorded_entries_count_offset_2 = <Self as Context<T>>::get_new_entry_index() as isize;
+        let lhs_index = <Self as ContextModulePrivate<T>>::get_new_variable_index();
+        let recorded_entries_count_offset_1 = <Self as ContextModulePrivate<T>>::get_new_entry_index() as isize;
+        let recorded_entries_count_offset_2 = <Self as ContextModulePrivate<T>>::get_new_entry_index() as isize;
 
         unsafe {
             // TODO is indexing inefficient?
-            *<Self as Context<T>>::get_adjoints().offset(recorded_entries_count_offset_1) = adjoints[0];
-            *<Self as Context<T>>::get_lhs_indices().offset(recorded_entries_count_offset_1) = lhs_index;
-            *<Self as Context<T>>::get_rhs_indices().offset(recorded_entries_count_offset_1) = rhs_indices[0];
+            *<Self as ContextModulePrivate<T>>::get_adjoints().offset(recorded_entries_count_offset_1) = adjoints[0];
+            *<Self as ContextModulePrivate<T>>::get_lhs_indices().offset(recorded_entries_count_offset_1) = lhs_index;
+            *<Self as ContextModulePrivate<T>>::get_rhs_indices().offset(recorded_entries_count_offset_1) = rhs_indices[0];
 
-            *<Self as Context<T>>::get_adjoints().offset(recorded_entries_count_offset_2) = adjoints[1];
-            *<Self as Context<T>>::get_lhs_indices().offset(recorded_entries_count_offset_2) = lhs_index;
-            *<Self as Context<T>>::get_rhs_indices().offset(recorded_entries_count_offset_2) = rhs_indices[1];
+            *<Self as ContextModulePrivate<T>>::get_adjoints().offset(recorded_entries_count_offset_2) = adjoints[1];
+            *<Self as ContextModulePrivate<T>>::get_lhs_indices().offset(recorded_entries_count_offset_2) = lhs_index;
+            *<Self as ContextModulePrivate<T>>::get_rhs_indices().offset(recorded_entries_count_offset_2) = rhs_indices[1];
         }
         lhs_index
+    }
+}
+
+pub trait ContextModulePrivate<T> where T: std::num::Float {
+    fn get_new_variable_index() -> usize {
+        let count = <Self as ContextModulePrivate<T>>::get_recorded_variables_count();
+        let index = *count;
+        *count += 1;
+        index
+    }
+
+    fn get_new_entry_index() -> usize {
+        let count = <Self as ContextModulePrivate<T>>::get_recorded_entries_count();
+        let index = *count;
+        *count += 1;
+        index
     }
 
     fn get_recorded_variables_count() -> &'static mut usize;
@@ -115,6 +116,12 @@ macro_rules! new_autograd_context {
             }
 
             impl $crate::Context<$T> for ContextImpl {
+            }
+
+            impl $crate::ContextCratePrivate<$T> for ContextImpl {
+            }
+
+            impl $crate::ContextModulePrivate<$T> for ContextImpl {
                 fn get_recorded_variables_count() -> &'static mut usize {
                     #[thread_local]
                     static mut ptr : usize = 0;
@@ -179,13 +186,13 @@ macro_rules! new_autograd_context {
                     // std::rt::heap::allocate(T_size, mem::min_align_of::<T>())
 
                     unsafe {
-                        *<Self as $crate::Context<$T>>::get_recorded_variables_count() = 0;
-                        *<Self as $crate::Context<$T>>::get_recorded_entries_count() = 0;
-                        *<Self as $crate::Context<$T>>::get_adjoints() = std::rt::heap::allocate(T_size, std::mem::align_of::<$T>()) as *mut $T;
-                        *<Self as $crate::Context<$T>>::get_lhs_indices() = std::rt::heap::allocate(usize_size, std::mem::align_of::<usize>()) as *mut usize;
-                        *<Self as $crate::Context<$T>>::get_rhs_indices() = std::rt::heap::allocate(usize_size, std::mem::align_of::<usize>()) as *mut usize;
+                        *<Self as $crate::ContextModulePrivate<$T>>::get_recorded_variables_count() = 0;
+                        *<Self as $crate::ContextModulePrivate<$T>>::get_recorded_entries_count() = 0;
+                        *<Self as $crate::ContextModulePrivate<$T>>::get_adjoints() = std::rt::heap::allocate(T_size, std::mem::align_of::<$T>()) as *mut $T;
+                        *<Self as $crate::ContextModulePrivate<$T>>::get_lhs_indices() = std::rt::heap::allocate(usize_size, std::mem::align_of::<usize>()) as *mut usize;
+                        *<Self as $crate::ContextModulePrivate<$T>>::get_rhs_indices() = std::rt::heap::allocate(usize_size, std::mem::align_of::<usize>()) as *mut usize;
                         // TODO we don't have to allocate get_result_derivatives now, isn't it?
-                        *<Self as $crate::Context<$T>>::get_result_derivatives() = std::rt::heap::allocate(T_size, std::mem::align_of::<$T>()) as *mut $T;
+                        *<Self as $crate::ContextModulePrivate<$T>>::get_result_derivatives() = std::rt::heap::allocate(T_size, std::mem::align_of::<$T>()) as *mut $T;
                     }
                     context
                 }
@@ -201,10 +208,10 @@ macro_rules! new_autograd_context {
                     let T_size = self.capacity * std::mem::size_of::<$T>();
 
                     unsafe {
-                        std::rt::heap::deallocate(*<Self as $crate::Context<$T>>::get_adjoints() as *mut u8, T_size, std::mem::align_of::<$T>());
-                        std::rt::heap::deallocate(*<Self as $crate::Context<$T>>::get_lhs_indices() as *mut u8, usize_size, std::mem::align_of::<usize>());
-                        std::rt::heap::deallocate(*<Self as $crate::Context<$T>>::get_rhs_indices() as *mut u8, usize_size, std::mem::align_of::<usize>());
-                        std::rt::heap::deallocate(*<Self as $crate::Context<$T>>::get_result_derivatives() as *mut u8, T_size, std::mem::align_of::<$T>());
+                        std::rt::heap::deallocate(*<Self as $crate::ContextModulePrivate<$T>>::get_adjoints() as *mut u8, T_size, std::mem::align_of::<$T>());
+                        std::rt::heap::deallocate(*<Self as $crate::ContextModulePrivate<$T>>::get_lhs_indices() as *mut u8, usize_size, std::mem::align_of::<usize>());
+                        std::rt::heap::deallocate(*<Self as $crate::ContextModulePrivate<$T>>::get_rhs_indices() as *mut u8, usize_size, std::mem::align_of::<usize>());
+                        std::rt::heap::deallocate(*<Self as $crate::ContextModulePrivate<$T>>::get_result_derivatives() as *mut u8, T_size, std::mem::align_of::<$T>());
                     }
                 }
             }

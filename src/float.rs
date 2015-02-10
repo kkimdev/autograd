@@ -38,7 +38,7 @@ impl <T, CT> std::ops::Neg for Float<T, CT> where T: std::num::Float, CT: super:
         // TODO rust doesn't have T::one() yet.
         let one: T = std::num::Float::one();
         Float{value: -self.value,
-              index: <CT as super::context::Context<T>>::unary_operation(one.neg(), self.index)}
+              index: <CT as super::context::ContextCratePrivate<T>>::unary_operation(one.neg(), self.index)}
     }
 }
 
@@ -47,7 +47,7 @@ impl <T, CT> std::ops::Add<Float<T, CT>> for Float<T, CT> where T: std::num::Flo
     type Output = Float<T, CT>;
     fn add(self, rhs: Float<T, CT>) -> Float<T, CT> {
         Float{value: self.value + rhs.value,
-              index: <CT as super::context::Context<T>>::binary_operation(
+              index: <CT as super::context::ContextCratePrivate<T>>::binary_operation(
                   &[std::num::Float::one(), std::num::Float::one()],
                   &[self.index, rhs.index])}
     }
@@ -58,7 +58,7 @@ impl <T, CT> std::ops::Sub<Float<T, CT>> for Float<T, CT> where T: std::num::Flo
     fn sub(self, rhs: Float<T, CT>) -> Float<T, CT> {
         let one: T = std::num::Float::one();
         Float{value: self.value - rhs.value,
-              index: <CT as super::context::Context<T>>::binary_operation(
+              index: <CT as super::context::ContextCratePrivate<T>>::binary_operation(
                   &[one, -one],
                   &[self.index, rhs.index])}
     }
@@ -68,7 +68,7 @@ impl <T, CT> std::ops::Mul<Float<T, CT>> for Float<T, CT> where T: std::num::Flo
     type Output = Float<T, CT>;
     fn mul(self, rhs: Float<T, CT>) -> Float<T, CT> {
         Float{value: self.value * rhs.value,
-              index: <CT as super::context::Context<T>>::binary_operation(
+              index: <CT as super::context::ContextCratePrivate<T>>::binary_operation(
                   &[rhs.value, self.value],
                   &[self.index, rhs.index])}
     }
@@ -78,7 +78,7 @@ impl <T, CT> std::ops::Div<Float<T, CT>> for Float<T, CT> where T: std::num::Flo
     type Output = Float<T, CT>;
     fn div(self, rhs: Float<T, CT>) -> Float<T, CT> {
         Float{value: self.value / rhs.value,
-              index: <CT as super::context::Context<T>>::binary_operation(
+              index: <CT as super::context::ContextCratePrivate<T>>::binary_operation(
                   &[rhs.value.recip(), -((self.value * self.value).recip())],
                   &[self.index, rhs.index])}
     }
@@ -94,7 +94,7 @@ impl <T, CT> std::ops::Rem<Float<T, CT>> for Float<T, CT> where T: std::num::Flo
         //         ) == (
         //         rhs . context as * const super::context::Context < T > ));
         Float{value: self.value % rhs.value,
-              index: <CT as super::context::Context<T>>::binary_operation(
+              index: <CT as super::context::ContextCratePrivate<T>>::binary_operation(
                   &[std::num::Float::one(), std::num::Float::zero()],
                   &[self.index, rhs.index])}
     }
