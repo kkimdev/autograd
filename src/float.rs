@@ -4,15 +4,308 @@
 
 extern crate std;
 
-#[derive(Clone)]
 pub struct Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     pub value: T,
     index: usize,
 }
 
 // TODO implement std::num::Float
-// impl <T: std::num::Float, CT: super::context::Context<T>> std::num::Float for Float<T, CT> {
-// }
+impl <T, CT> std::num::Float for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
+    fn nan() -> Self {
+        unimplemented!();
+    }
+
+    fn infinity() -> Self {
+        unimplemented!();
+    }
+
+    fn neg_infinity() -> Self {
+        unimplemented!();
+    }
+
+    fn zero() -> Self {
+        unimplemented!();
+    }
+
+    fn neg_zero() -> Self {
+        unimplemented!();
+    }
+
+    fn one() -> Self {
+        unimplemented!();
+    }
+
+    fn mantissa_digits(unused_self: Option<Self>) -> usize {
+        unimplemented!();
+    }
+
+    fn digits(unused_self: Option<Self>) -> usize {
+        unimplemented!();
+    }
+
+    fn epsilon() -> Self {
+        unimplemented!();
+    }
+
+    fn min_exp(unused_self: Option<Self>) -> isize {
+        unimplemented!();
+    }
+
+    fn max_exp(unused_self: Option<Self>) -> isize {
+        unimplemented!();
+    }
+
+    fn min_10_exp(unused_self: Option<Self>) -> isize {
+        unimplemented!();
+    }
+
+    fn max_10_exp(unused_self: Option<Self>) -> isize {
+        unimplemented!();
+    }
+
+    fn min_value() -> Self {
+        unimplemented!();
+    }
+
+    fn min_pos_value(unused_self: Option<Self>) -> Self {
+        unimplemented!();
+    }
+
+    fn max_value() -> Self {
+        unimplemented!();
+    }
+
+    fn is_nan(self) -> bool {
+        self.value.is_nan()
+    }
+
+    fn is_infinite(self) -> bool {
+        self.value.is_infinite()
+    }
+
+    fn is_finite(self) -> bool {
+        self.value.is_finite()
+    }
+
+    fn is_normal(self) -> bool {
+        self.value.is_normal()
+    }
+
+    fn classify(self) -> std::num::FpCategory {
+        self.value.classify()
+    }
+
+    fn integer_decode(self) -> (u64, i16, i8) {
+        self.value.integer_decode()
+    }
+
+    fn floor(self) -> Self {
+        unimplemented!();
+    }
+
+    fn ceil(self) -> Self {
+        unimplemented!();
+    }
+
+    fn round(self) -> Self {
+        unimplemented!();
+    }
+
+    fn trunc(self) -> Self {
+        unimplemented!();
+    }
+
+    fn fract(self) -> Self {
+        unimplemented!();
+    }
+
+    fn abs(self) -> Self {
+        unimplemented!();
+    }
+
+    fn signum(self) -> Self {
+        unimplemented!();
+    }
+
+    fn is_positive(self) -> bool {
+        self.value.is_positive()
+    }
+
+    fn is_negative(self) -> bool {
+        self.value.is_negative()
+    }
+
+    fn mul_add(self, a: Self, b: Self) -> Self {
+        unimplemented!();
+    }
+
+    fn recip(self) -> Self {
+        unimplemented!();
+    }
+
+    fn powi(self, n: i32) -> Self {
+        unimplemented!();
+    }
+
+    fn powf(self, n: Self) -> Self {
+        unimplemented!();
+    }
+
+    fn sqrt(self) -> Self {
+        let one = <T as std::num::Float>::one();
+        let two = one + one;
+        let sqrt_value = self.value.sqrt();
+        Float{value: sqrt_value,
+              index: <CT as super::context::ContextCratePrivate<T>>::unary_operation(
+                  (two * sqrt_value).recip(), self.index)}
+    }
+
+    fn rsqrt(self) -> Self {
+        unimplemented!();
+    }
+
+    fn exp(self) -> Self {
+        let exp_value = self.value.exp();
+        Float{value: exp_value,
+              index: <CT as super::context::ContextCratePrivate<T>>::unary_operation(
+                  exp_value, self.index)}
+    }
+
+    fn exp2(self) -> Self {
+        unimplemented!();
+    }
+
+    fn ln(self) -> Self {
+        unimplemented!();
+    }
+
+    fn log(self, base: Self) -> Self {
+        unimplemented!();
+    }
+
+    fn log2(self) -> Self {
+        unimplemented!();
+    }
+
+    fn log10(self) -> Self {
+        unimplemented!();
+    }
+
+    fn to_degrees(self) -> Self {
+        unimplemented!();
+    }
+
+    fn to_radians(self) -> Self {
+        unimplemented!();
+    }
+
+    fn ldexp(x: Self, exp: isize) -> Self {
+        unimplemented!();
+    }
+
+    fn frexp(self) -> (Self, isize) {
+        unimplemented!();
+    }
+
+    fn next_after(self, other: Self) -> Self {
+        unimplemented!();
+    }
+
+    fn max(self, other: Self) -> Self {
+        unimplemented!();
+    }
+
+    fn min(self, other: Self) -> Self {
+        unimplemented!();
+    }
+
+    fn abs_sub(self, other: Self) -> Self {
+        unimplemented!();
+    }
+
+    fn cbrt(self) -> Self {
+        unimplemented!();
+    }
+
+    fn hypot(self, other: Self) -> Self {
+        unimplemented!();
+    }
+
+    fn sin(self) -> Self {
+        Float{value: self.value.sin(),
+              index: <CT as super::context::ContextCratePrivate<T>>::unary_operation(
+                  self.value.cos(), self.index)}
+    }
+
+    fn cos(self) -> Self {
+        Float{value: self.value.cos(),
+              index: <CT as super::context::ContextCratePrivate<T>>::unary_operation(
+                  -self.value.sin(), self.index)}
+    }
+
+    fn tan(self) -> Self {
+        unimplemented!();
+    }
+
+    fn asin(self) -> Self {
+        unimplemented!();
+    }
+
+    fn acos(self) -> Self {
+        unimplemented!();
+    }
+
+    fn atan(self) -> Self {
+        unimplemented!();
+    }
+
+    fn atan2(self, other: Self) -> Self {
+        unimplemented!();
+    }
+
+    fn sin_cos(self) -> (Self, Self) {
+        unimplemented!();
+    }
+
+    fn exp_m1(self) -> Self {
+        unimplemented!();
+    }
+
+    fn ln_1p(self) -> Self {
+        unimplemented!();
+    }
+
+    fn sinh(self) -> Self {
+        unimplemented!();
+    }
+
+    fn cosh(self) -> Self {
+        unimplemented!();
+    }
+
+    fn tanh(self) -> Self {
+        unimplemented!();
+    }
+
+    fn asinh(self) -> Self {
+        unimplemented!();
+    }
+
+    fn acosh(self) -> Self {
+        unimplemented!();
+    }
+
+    fn atanh(self) -> Self {
+        unimplemented!();
+    }
+}
+
+impl <T, CT> std::clone::Clone for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
+    fn clone(&self) -> Self {
+        Float{value: self.value, index: self.index}
+    }
+}
+
 
 impl <T, CT> std::num::ToPrimitive for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     fn to_i64(&self) -> Option<i64> { self.value.to_i64() }
@@ -21,9 +314,11 @@ impl <T, CT> std::num::ToPrimitive for Float<T, CT> where T: std::num::Float, CT
     //TODO implement the rest optional function.
 }
 
-// TODO implement std::num::NumCast, actually, can I? Should we allow?
-// impl <T: std::num::Float, CT: super::context::Context<T>> std::num::NumCast for Float<T, CT> {
-// }
+impl <T, CT> std::num::NumCast for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
+    fn from<TP>(n: TP) -> Option<Self> where TP: std::num::ToPrimitive {
+        None
+    }
+}
 
 impl <T, CT> std::ops::Neg for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     type Output = Float<T, CT>;
