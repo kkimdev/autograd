@@ -5,6 +5,8 @@
 extern crate autograd;
 use autograd::Context;
 use std::num::Float;
+use std::ops::Add;
+use std::ops::Mul;
 use std::ops::Neg;
 
 macro_rules! unary_operation_test {
@@ -27,40 +29,32 @@ macro_rules! unary_operation_test {
 unary_operation_test!(cos, 0., 1., 0.);
 unary_operation_test!(neg, 1.5, -1.5, -1.);
 
-#[test]
-fn addition() {
-    let context = new_autograd_context!(f32, 1000);
-    let x1 = context.new_variable(1.5);
-    let x2 = context.new_variable(2.5);
+macro_rules! binary_operation_test {
+    ($name:ident, $x1:expr, $x2:expr, $y:expr, $dx1:expr, $dx2:expr) => (
+        #[test]
+        fn $name() {
+            let context = new_autograd_context!(f32, 1000);
+            let x1 = context.new_variable($x1);
+            let x2 = context.new_variable($x2);
 
-    let y = x1 + x2;
-    assert_eq!(y.value, 4.);
+            let y = x1.$name(x2);
+            assert_eq!(y.value, $y);
 
-    context.differentiate(y);
-    assert_eq!(context.get_derivative(x1), 1.);
-    assert_eq!(context.get_derivative(x2), 1.);
-    assert_eq!(context.get_derivative(y), 1.);
+            context.differentiate(y);
+            assert_eq!(context.get_derivative(x1), $dx1);
+            assert_eq!(context.get_derivative(x2), $dx2);
+            assert_eq!(context.get_derivative(y), 1.);
+        }
+    )
 }
 
-#[test]
-fn multiplication() {
-    let context = new_autograd_context!(f32, 1000);
-    let x1 = context.new_variable(1.5);
-    let x2 = context.new_variable(2.5);
-
-    let y = x1 * x2;
-    assert_eq!(y.value, 3.75);
-
-    context.differentiate(y);
-    assert_eq!(context.get_derivative(x1), 2.5);
-    assert_eq!(context.get_derivative(x2), 1.5);
-    assert_eq!(context.get_derivative(y), 1.);
-}
+binary_operation_test!(add, 1.5, 2.5, 4., 1., 1.);
+binary_operation_test!(mul, 1.5, 2.5, 3.75, 2.5, 1.5);
 
 #[test]
 fn single_thread_multiple_run() {
     for _ in 0..10 {
-        addition();
+        add();
     }
 }
 
