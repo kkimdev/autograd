@@ -74,7 +74,7 @@ fn capacity_full() {
 }
 
 #[test]
-#[should_fail(expected = "There are more recorded variables, 101, than tis capacity, 100. Memory is corrupted. Please consider using bigger capacity.")]
+#[should_fail(expected = "There are more recorded variables, 101, than its capacity, 100. Memory is corrupted. Please consider using bigger capacity.")]
 fn capacity_overflow() {
     let context = new_autograd_context!(f32, 100);
     for _ in 0..100 {

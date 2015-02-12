@@ -23,7 +23,7 @@ pub trait Context<InternalFloat>: ContextCratePrivate<InternalFloat> + std::mark
         // TODO The current implementation is not performant and dirty.
         unsafe {
             assert!(*<Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count() <= self.capacity(),
-                "There are more recorded variables, {}, than tis capacity, {}. Memory is corrupted. Please consider using bigger capacity.",
+                "There are more recorded variables, {}, than its capacity, {}. Memory is corrupted. Please consider using bigger capacity.",
                 *<Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count(), self.capacity());
 
             for i in (0..(*<Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count())) {
