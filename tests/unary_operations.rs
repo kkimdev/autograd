@@ -25,5 +25,8 @@ macro_rules! unary_operation_test {
     )
 }
 
+// TODO What if we want multiple tests for an unary operation?
 unary_operation_test!(cos, 0., 1., 0.);
 unary_operation_test!(neg, 1.5, -1.5, -1.);
+unary_operation_test!(sqrt, 16., 4., 0.125);
+unary_operation_test!(exp, 0., 1., 1.);
