@@ -8,6 +8,8 @@ use autograd::Context;
 use std::ops::Add;
 use std::ops::Mul;
 
+// TODO Write binary operation tests with constants involved.
+//      There is a Rust bug regarding this though. https://github.com/rust-lang/rust/issues/19035
 macro_rules! binary_operation_test {
     ($name:ident, $x1:expr, $x2:expr, $y:expr, $dx1:expr, $dx2:expr) => (
         #[test]
