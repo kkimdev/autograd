@@ -1,44 +1,27 @@
-# Warning
-This library is under development and not ready to use yet.
-
 # Autograd
-Rust automatic differentiation library computing gradient values. It is mainly for nonlinear optimization and machine learning.
+Rust automatic differentiation library to compute gradient values. It is mainly for nonlinear optimization and machine learning. **It is alpha stage yet.**
 
 ## Example
 ~~~rust
-fn main() {
-    let context = autograd::Context::<f32>::new();
+#[macro_use]
+extern crate autograd;
 
-    // Initializes variables to begin with.
+use autograd::Context;
+
+fn main() {
+    let context = new_autograd_context!(f32, 100);
+
+    // Initializes input variables.
     let x1 = context.new_variable(1.5);
-    let x2 = context.new_variable(2.5);
+    let x2 = context.new_variable(2.);
 
     // Computes a math expression.
-    let y = x1 + x2;
-    println!("y   == {}", y.get_value());
+    let y = x1 * x2 + x1 + 5.;
+    println!("y   == {}", y.value); // y   == 9.5
 
     // Computes gradient with respect to y.
     context.differentiate(y);
-    println!("dx1 == {}", context.get_derivative(x1));
-    println!("dx2 == {}", context.get_derivative(x2));
-}
-~~~
-
-~~~rust
-fn main() {
-    let context = autograd::Context::<f32>::new();
-
-    // Initializes variables to begin with.
-    let x1 = autograd::Float::new(context, 1.5);
-    let x2 = autograd::Float::new(context, 2.5);
-
-    // Computes a simple math expression.
-    let y = x1 + x2;
-    println!("y   == {}", y.get_value());
-
-    // Computes gradient with respect to y.
-    y.differentiate();
-    println!("dx1 == {}", x1.get_derivative());
-    println!("dx2 == {}", x2.get_derivative());
+    println!("dx1 == {}", context.get_derivative(x1)); // dx1 == 3
+    println!("dx2 == {}", context.get_derivative(x2)); // dx2 == 1.5
 }
 ~~~
