@@ -4,6 +4,9 @@
 
 extern crate std;
 
+// TODO Using expression template will give better performance.
+//      e.g., http://www.met.reading.ac.uk/clouds/adept/
+
 pub struct Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     pub value: T,
     index: usize,
