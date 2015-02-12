@@ -19,11 +19,14 @@ pub trait Context<T>: ContextCratePrivate<T> + std::marker::Sized where T: std::
         FloatCratePrivate::new(value, <Self as ContextModulePrivate<T>>::get_new_variable_index())
     }
 
-    fn differentiate(&self, float: super::float::Float<T, Self>) {
-        // TODO check if it exceeded the capacity.
+
+    fn differentiate(&self, float: super::float::Float<InternalFloat, Self>) {
         // TODO The current implementation is not performant and dirty.
         unsafe {
-            // let count = <Self as Context<T>>::get_recorded_variables_count();
+            assert!(*<Self as ContextModulePrivate<T>>::get_recorded_variables_count() <= self.capacity(),
+                "There are more recorded variables, {}, than tis capacity, {}. Memory is corrupted. Please consider using bigger capacity.",
+                *<Self as ContextModulePrivate<T>>::get_recorded_variables_count(), self.capacity());
+
             for i in (0..(*<Self as ContextModulePrivate<T>>::get_recorded_variables_count())) {
                 *<Self as ContextModulePrivate<T>>::get_result_derivatives().offset(i as isize) = std::num::Float::zero();
             }
@@ -97,6 +100,8 @@ pub trait ContextModulePrivate<T> where T: std::num::Float {
         index
     }
 
+    fn capacity(&self) -> usize;
+
     fn get_recorded_variables_count() -> &'static mut usize;
     fn get_recorded_entries_count() -> &'static mut usize;
     // TODO use 'static lifetime instead?
@@ -122,6 +127,10 @@ macro_rules! new_autograd_context {
             }
 
             impl $crate::ContextModulePrivate<$T> for ContextImpl {
+                fn capacity(&self) -> usize {
+                    self.capacity
+                }
+
                 fn get_recorded_variables_count() -> &'static mut usize {
                     #[thread_local]
                     static mut ptr : usize = 0;

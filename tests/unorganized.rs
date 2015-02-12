@@ -58,3 +58,24 @@ fn context_capacity_expression_argument() {
     let b = 10;
     let context = new_autograd_context!(f32, a/b);
 }
+
+#[test]
+fn capacity_full() {
+    let context = new_autograd_context!(f32, 100);
+    for _ in 0..99 {
+        context.new_variable(1.);
+    }
+    let y = context.new_variable(1.);
+    context.differentiate(y)
+}
+
+#[test]
+#[should_fail(expected = "There are more recorded variables, 101, than tis capacity, 100. Memory is corrupted. Please consider using bigger capacity.")]
+fn capacity_overflow() {
+    let context = new_autograd_context!(f32, 100);
+    for _ in 0..100 {
+        context.new_variable(1.);
+    }
+    let y = context.new_variable(1.);
+    context.differentiate(y)
+}
