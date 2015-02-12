@@ -16,9 +16,6 @@
 mod context;
 mod float;
 
-#[cfg(test)]
-mod tests;
-
 pub use context::Context;
 // TODO ideally Private traits shouldn't be exported.
 pub use context::ContextCratePrivate;
