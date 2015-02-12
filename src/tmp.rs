@@ -220,9 +220,6 @@
 //
 // }
 
-// TODO : Maybe we shouldn't allow converting to AutogradFloat type from a raw number.
-//        because ideally we shouldn't have AutogradFloat type constant.
-//        Or maybe just return None always.
 // impl <'a, T: Float> std::num::NumCast for AutogradFloat<'a, T> {
 //     fn from<U: ToPrimitive>(n: U) -> Option<AutogradFloat<'a, T>> {
 //         match std::num::NumCast::from(n) {
@@ -233,14 +230,12 @@
 // }
 
 
-// TODO Float trait's Binary operators' rhs are value. Should we get a reference?
 // impl <'a, T: Float> std::ops::Add<&'a AutogradFloat<'a, T>, AutogradFloat<'a, T>> for AutogradFloat<'a, T> {
 //     fn add(self, rhs: &AutogradFloat<T>) -> AutogradFloat<'a T> {
 //          AutogradFloat{x: self.x.add(rhs.x), tape: None, tape_index: 0,}
 //     }
 // }
 
-// TODO implement operations with underlying type.
 // impl <'a, T: Float> std::ops::Add<T, AutogradFloat<'a, T>> for AutogradFloat<'a, T> {
 //     fn add(&self, rhs: &T) -> AutogradFloat<'a, T> {
 //         AutogradFloat{x: self.x.add(rhs), tape: None, tape_index: 0,}

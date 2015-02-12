@@ -331,6 +331,7 @@ impl <T, CT> std::ops::Neg for Float<T, CT> where T: std::num::Float, CT: super:
 }
 
 // TODO adjoints of 1 can be optimized out, i.e., not multiplying. Should we?
+// TODO implement operations with underlying type.
 impl <T, CT> std::ops::Add<Float<T, CT>> for Float<T, CT> where T: std::num::Float, CT: super::context::Context<T> {
     type Output = Float<T, CT>;
     fn add(self, rhs: Float<T, CT>) -> Float<T, CT> {
