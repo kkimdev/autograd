@@ -1,11 +1,13 @@
 /* Any copyright is dedicated to the Public Domain.
  * http://creativecommons.org/publicdomain/zero/1.0/ */
 
+#![feature(std_misc)]
+#![feature(core)]
+
 #[macro_use]
 extern crate autograd;
 
 use autograd::Context;
-use std::num::Float;
 
 #[test]
 fn single_thread_multiple_run() {
@@ -42,6 +44,7 @@ fn multi_thread_multiple_run() {
 
 #[test]
 #[should_fail(expected = "This Context instance is in use now. Note that a Context instance is allowed per construction location and per thread. Consequently, it cannot be recursively constructed unless it is destructed. This is a limitation caused by the thread local static variables usages in the current implementation.")]
+#[allow(unused_variables)]
 fn context_lock() {
     fn recursive_context(n: usize) {
         if n > 0 {
@@ -53,6 +56,7 @@ fn context_lock() {
 }
 
 #[test]
+#[allow(unused_variables)]
 fn context_capacity_expression_argument() {
     let a = 200;
     let b = 10;

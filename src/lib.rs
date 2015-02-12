@@ -8,7 +8,10 @@
 
 #![crate_name = "autograd"]
 #![crate_type = "rlib"]
+
 #![feature(thread_local)]
+#![feature(std_misc)]
+#![feature(core)]
 
 mod context;
 mod float;
