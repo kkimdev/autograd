@@ -6,7 +6,7 @@
 
 [package]
 name = "autograd"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["Kibeom Kim <kk1674@nyu.edu>"]
 
 [[bin]]
