@@ -26,6 +26,8 @@ macro_rules! unary_operation_test {
 }
 
 // TODO What if we want multiple tests for an unary operation?
+//      We can't use concat_idents! for function name yet though.
+//      https://github.com/rust-lang/rust/issues/12249
 unary_operation_test!(cos, 0., 1., 0.);
 unary_operation_test!(neg, 1.5, -1.5, -1.);
 unary_operation_test!(sqrt, 16., 4., 0.125);

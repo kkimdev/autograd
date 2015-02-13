@@ -6,6 +6,11 @@
 # Autogard
 */
 
+// TODO Using expression template will give better performance.
+//      e.g., http://www.met.reading.ac.uk/clouds/adept/
+
+// TODO Multi-threading support.
+
 #![crate_name = "autograd"]
 #![crate_type = "rlib"]
 
