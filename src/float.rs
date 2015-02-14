@@ -4,6 +4,8 @@
 
 extern crate std;
 
+// TODO derive Hash?
+#[derive(Debug)]
 pub struct Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
     pub value: InternalFloat,
     index: usize,
@@ -519,8 +521,6 @@ impl <InternalFloat, CT> std::cmp::PartialOrd for Float<InternalFloat, CT> where
 
 impl <InternalFloat, CT> std::marker::Copy for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
 }
-
-// Crate private functions
 
 pub trait FloatCratePrivate<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
     fn new(value: InternalFloat, index: usize) ->Self;
