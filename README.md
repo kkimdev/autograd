@@ -9,6 +9,7 @@ extern crate autograd;
 use autograd::Context;
 
 fn main() {
+    // Initialize Autograd context with type f32 and capacity 100.
     let context = new_autograd_context!(f32, 100);
 
     // Initializes input variables.
