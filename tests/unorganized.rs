@@ -73,13 +73,13 @@ fn capacity_full() {
     context.differentiate(y)
 }
 
+// TODO Test capacity overflow check at context.differentiate(...). But it will be double-panic since it's also panicking at Drop.
+
 #[test]
 #[should_fail(expected = "There are more recorded variables, 101, than its capacity, 100. Memory is corrupted. Please consider using bigger capacity.")]
-fn capacity_overflow() {
+fn capacity_overflow_drop() {
     let context = new_autograd_context!(f32, 100);
-    for _ in 0..100 {
+    for _ in 0..101 {
         context.new_variable(1.);
     }
-    let y = context.new_variable(1.);
-    context.differentiate(y)
 }

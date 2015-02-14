@@ -205,9 +205,14 @@ macro_rules! new_autograd_context {
 
             impl std::ops::Drop for ContextImpl {
                 fn drop(&mut self) {
+                    // TODO Ideally we should detect overflow at the time it overflows. Similar to stack overflow problem. mprotect?
+                    assert!(*<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_recorded_variables_count() <= ($crate::ContextModulePrivate::<$InternalFloat>::capacity(self)),
+                        "There are more recorded variables, {}, than its capacity, {}. Memory is corrupted. Please consider using bigger capacity.",
+                        *<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_recorded_variables_count(), ($crate::ContextModulePrivate::<$InternalFloat>::capacity(self)));
+
+                    // TODO Do we want to reset these?
                     // *Context::<$InternalFloat>::get_recorded_variables_count(None::<Self>) = 0;
                     // *Context::<$InternalFloat>::get_adjoints(None::<Self>) = 0;
-                    // TODO implement.
 
                     let usize_size = self.capacity * std::mem::size_of::<usize>();
                     let t_size = self.capacity * std::mem::size_of::<$InternalFloat>();
