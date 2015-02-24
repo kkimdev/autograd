@@ -2,7 +2,7 @@
  * http://creativecommons.org/publicdomain/zero/1.0/ */
 
 #![feature(std_misc)]
-#![feature(core)]
+#![feature(alloc)]
 
 #[macro_use]
 extern crate autograd;
