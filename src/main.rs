@@ -15,14 +15,17 @@ fn main() {
 
     // Initializes input variables.
     let x1 = context.new_variable(1.5);
-    let x2 = context.new_variable(2.);
+    println!("x1  == {}", x1.value); // 1.5
+    let x2 = context.new_variable(2.0);
+    println!("x2  == {}", x2.value); // 2
 
     // Computes a math expression.
-    let y = x1 * x2 + x1 + 5.;
-    println!("y   == {}", y.value); // y   == 9.5
+    let y = (x1 * x2) + x1 + 5.0;
+    println!("y = (x1 * x2) + x1 + 5.0");
+    println!("y   == {}", y.value); // 9.5
 
     // Computes gradient with respect to y.
     context.differentiate(y);
-    println!("dx1 == {}", context.get_derivative(x1)); // dx1 == 3
-    println!("dx2 == {}", context.get_derivative(x2)); // dx2 == 1.5
+    println!("dx1 == {}", context.get_derivative(x1)); // 3
+    println!("dx2 == {}", context.get_derivative(x2)); // 1.5
 }
