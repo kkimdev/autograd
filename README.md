@@ -1,4 +1,4 @@
-# Autograd
+# Autograd [![Build Status](https://travis-ci.org/kkimdev/autograd.svg?branch=master)](https://travis-ci.org/kkimdev/autograd)
 Rust automatic differentiation library to compute gradient values. It is mainly for nonlinear optimization and machine learning. **It is alpha stage yet.**
 
 ## Example
