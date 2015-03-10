@@ -112,8 +112,7 @@ macro_rules! new_autograd_context {
         {
             struct ContextImpl {
                 capacity: usize,
-                #[allow(dead_code)] // mutex_guard is active during its scope. No need to use directly.
-                mutex_guard: std::sync::MutexGuard<'static ()>,
+                _mutex_guard: std::sync::MutexGuard<'static ()>,
             }
 
             impl $crate::Context<$InternalFloat> for ContextImpl {
@@ -177,9 +176,9 @@ macro_rules! new_autograd_context {
                     let context;
 
                     #[thread_local]
-                    static LOCK : std::sync::StaticMutex = std::sync::MUTEX_INIT;
-                    match LOCK.try_lock() {
-                        Ok(guard) => context = ContextImpl{capacity: capacity, mutex_guard: guard},
+                    static _MUTEX : std::sync::StaticMutex = std::sync::MUTEX_INIT;
+                    match _MUTEX.try_lock() {
+                        Ok(mutex_guard) => context = ContextImpl{capacity: capacity, _mutex_guard: mutex_guard},
                         Err(std::sync::TryLockError::WouldBlock) => panic!("This Context instance is in use now. Note that a Context instance is allowed per construction location and per thread. Consequently, it cannot be recursively constructed unless it is destructed. This is a limitation caused by the thread local static variables usages in the current implementation."),
                         Err(std::sync::TryLockError::Poisoned(poison_error)) => panic!("{:?}", poison_error),
                     }
