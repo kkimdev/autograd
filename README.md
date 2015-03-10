@@ -20,7 +20,7 @@ fn main() {
 
     // Computes a math expression.
     let y = (x1 * x2) + x1 + 5.0;
-    println!("y = (x1 * x2) + x1 + 5.0");
+    println!("y    = (x1 * x2) + x1 + 5.0");
     println!("y   == {}", y.value); // 9.5
 
     // Computes gradient with respect to y.
