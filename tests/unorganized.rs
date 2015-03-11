@@ -44,7 +44,7 @@ fn multi_thread_multiple_run() {
 }
 
 #[test]
-#[should_fail(expected = "This Context instance is in use now. Note that a Context instance is allowed per construction location and per thread. Consequently, it cannot be recursively constructed unless it is destructed. This is a limitation caused by the thread local static variables usages in the current implementation.")]
+#[should_panic(expected = "This Context instance is in use now. Note that a Context instance is allowed per construction location and per thread. Consequently, it cannot be recursively constructed unless it is destructed. This is a limitation caused by the thread local static variables usages in the current implementation.")]
 #[allow(unused_variables)]
 fn context_lock() {
     fn recursive_context(n: usize) {
@@ -77,7 +77,7 @@ fn capacity_full() {
 // TODO Test capacity overflow check at context.differentiate(...). But it will be double-panic since it's also panicking at Drop.
 
 #[test]
-#[should_fail(expected = "There are more recorded variables, 101, than its capacity, 100. Memory is corrupted. Please consider using bigger capacity.")]
+#[should_panic(expected = "There are more recorded variables, 101, than its capacity, 100. Memory is corrupted. Please consider using bigger capacity.")]
 fn capacity_overflow_drop() {
     let context = new_autograd_context!(f32, 100);
     for _ in 0..101 {
