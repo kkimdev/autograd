@@ -11,6 +11,8 @@
 
 // TODO Multi-threading support.
 
+// TODO Add Valgrind, ASAN, and TSAN tests.
+
 #![crate_name = "autograd"]
 #![crate_type = "rlib"]
 
