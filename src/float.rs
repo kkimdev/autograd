@@ -216,7 +216,7 @@ impl <InternalFloat, CT> std::num::Float for Float<InternalFloat, CT> where Inte
     }
 
     #[allow(unused_variables)]
-    fn ldexp(x: Self, exp: isize) -> Self {
+    fn ldexp(self, exp: isize) -> Self {
         unimplemented!();
     }
 
