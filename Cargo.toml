@@ -11,6 +11,6 @@ version = "0.1.0"
 authors = ["Kibeom Kim <kk1674@nyu.edu>"]
 
 [[bin]]
-name = "autograd-bin"
+name = "autograd_bin"
 test = false
 doc = false
