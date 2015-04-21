@@ -11,6 +11,7 @@ extern crate autograd;
 use autograd::Context;
 use std::ops::Add;
 use std::ops::Mul;
+use std::ops::Div;
 
 // TODO Write binary operation tests with constants involved.
 //      There is a Rust bug regarding this though. https://github.com/rust-lang/rust/issues/19035
@@ -35,3 +36,4 @@ macro_rules! binary_operation_test {
 
 binary_operation_test!(add, 1.5, 2.5, 4., 1., 1.);
 binary_operation_test!(mul, 1.5, 2.5, 3.75, 2.5, 1.5);
+binary_operation_test!(div, 2.0, 1.0, 2.0, 1.0, -0.25);
