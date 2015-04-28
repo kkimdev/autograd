@@ -2,18 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-extern crate std;
+use num;
+use std;
 
 // TODO derive Hash?
 #[derive(Debug)]
-pub struct Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+pub struct Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     pub value: InternalFloat,
     index: usize,
     phantom_context: std::marker::PhantomData<CT>
 }
 
-// TODO implement std::num::Float
-impl <InternalFloat, CT> std::num::Float for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+// TODO implement num::Float
+impl <InternalFloat, CT> num::Float for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     fn nan() -> Self {
         unimplemented!();
     }
@@ -26,58 +27,11 @@ impl <InternalFloat, CT> std::num::Float for Float<InternalFloat, CT> where Inte
         unimplemented!();
     }
 
-    fn zero() -> Self {
-        unimplemented!();
-    }
-
     fn neg_zero() -> Self {
         unimplemented!();
     }
 
-    fn one() -> Self {
-        unimplemented!();
-    }
-
-    #[allow(unused_variables)]
-    fn mantissa_digits(unused_self: Option<Self>) -> usize {
-        unimplemented!();
-    }
-
-    #[allow(unused_variables)]
-    fn digits(unused_self: Option<Self>) -> usize {
-        unimplemented!();
-    }
-
-    fn epsilon() -> Self {
-        unimplemented!();
-    }
-
-    #[allow(unused_variables)]
-    fn min_exp(unused_self: Option<Self>) -> isize {
-        unimplemented!();
-    }
-
-    #[allow(unused_variables)]
-    fn max_exp(unused_self: Option<Self>) -> isize {
-        unimplemented!();
-    }
-
-    #[allow(unused_variables)]
-    fn min_10_exp(unused_self: Option<Self>) -> isize {
-        unimplemented!();
-    }
-
-    #[allow(unused_variables)]
-    fn max_10_exp(unused_self: Option<Self>) -> isize {
-        unimplemented!();
-    }
-
     fn min_value() -> Self {
-        unimplemented!();
-    }
-
-    #[allow(unused_variables)]
-    fn min_pos_value(unused_self: Option<Self>) -> Self {
         unimplemented!();
     }
 
@@ -103,10 +57,6 @@ impl <InternalFloat, CT> std::num::Float for Float<InternalFloat, CT> where Inte
 
     fn classify(self) -> std::num::FpCategory {
         self.value.classify()
-    }
-
-    fn integer_decode(self) -> (u64, i16, i8) {
-        self.value.integer_decode()
     }
 
     fn floor(self) -> Self {
@@ -137,12 +87,12 @@ impl <InternalFloat, CT> std::num::Float for Float<InternalFloat, CT> where Inte
         unimplemented!();
     }
 
-    fn is_positive(self) -> bool {
-        self.value.is_positive()
+    fn is_sign_positive(self) -> bool {
+        self.value.is_sign_positive()
     }
 
-    fn is_negative(self) -> bool {
-        self.value.is_negative()
+    fn is_sign_negative(self) -> bool {
+        self.value.is_sign_negative()
     }
 
     #[allow(unused_variables)]
@@ -165,17 +115,13 @@ impl <InternalFloat, CT> std::num::Float for Float<InternalFloat, CT> where Inte
     }
 
     fn sqrt(self) -> Self {
-        let one = <InternalFloat as std::num::Float>::one();
+        let one = <InternalFloat as num::One>::one();
         let two = one + one;
         let sqrt_value = self.value.sqrt();
         Float{value: sqrt_value,
               index: <CT as super::context::ContextCratePrivate<InternalFloat>>::unary_operation(
                   (two * sqrt_value).recip(), self.index),
               phantom_context: std::marker::PhantomData}
-    }
-
-    fn rsqrt(self) -> Self {
-        unimplemented!();
     }
 
     fn exp(self) -> Self {
@@ -204,28 +150,6 @@ impl <InternalFloat, CT> std::num::Float for Float<InternalFloat, CT> where Inte
     }
 
     fn log10(self) -> Self {
-        unimplemented!();
-    }
-
-    fn to_degrees(self) -> Self {
-        unimplemented!();
-    }
-
-    fn to_radians(self) -> Self {
-        unimplemented!();
-    }
-
-    #[allow(unused_variables)]
-    fn ldexp(self, exp: isize) -> Self {
-        unimplemented!();
-    }
-
-    fn frexp(self) -> (Self, isize) {
-        unimplemented!();
-    }
-
-    #[allow(unused_variables)]
-    fn next_after(self, other: Self) -> Self {
         unimplemented!();
     }
 
@@ -323,34 +247,62 @@ impl <InternalFloat, CT> std::num::Float for Float<InternalFloat, CT> where Inte
     fn atanh(self) -> Self {
         unimplemented!();
     }
+
+    fn integer_decode(self) -> (u64, i16, i8) {
+        self.value.integer_decode()
+    }
 }
 
-impl <InternalFloat, CT> std::clone::Clone for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> num::Zero for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
+    fn zero() -> Self {
+        unimplemented!();
+    }
+    fn is_zero(&self) -> bool {
+        self.value.is_zero()
+    }
+}
+
+impl <InternalFloat, CT> num::One for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
+    fn one() -> Self {
+        unimplemented!();
+    }
+}
+
+impl <InternalFloat, CT> num::Num for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
+    type FromStrRadixErr = num::traits::ParseFloatError;
+
+    #[allow(unused_variables)]
+    fn from_str_radix(str: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+        unimplemented!();
+    }
+}
+
+impl <InternalFloat, CT> std::clone::Clone for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     fn clone(&self) -> Self {
         Float{value: self.value, index: self.index, phantom_context: std::marker::PhantomData}
     }
 }
 
 
-impl <InternalFloat, CT> std::num::ToPrimitive for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> num::ToPrimitive for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     fn to_i64(&self) -> Option<i64> { self.value.to_i64() }
 
     fn to_u64(&self) -> Option<u64> { self.value.to_u64() }
     //TODO implement the rest optional function.
 }
 
-impl <InternalFloat, CT> std::num::NumCast for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> num::NumCast for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     #[allow(unused_variables)]
-    fn from<TP>(n: TP) -> Option<Self> where TP: std::num::ToPrimitive {
+    fn from<TP>(n: TP) -> Option<Self> where TP: num::ToPrimitive {
         panic!("We disallow constructing from a constant because it is unnecessary.");
     }
 }
 
-impl <InternalFloat, CT> std::ops::Neg for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Neg for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn neg(self) -> Float<InternalFloat, CT> {
         // TODO rust doesn't have T::one() yet.
-        let one: InternalFloat = std::num::Float::one();
+        let one: InternalFloat = num::traits::One::one();
         Float{value: -self.value,
               index: <CT as super::context::ContextCratePrivate<InternalFloat>>::unary_operation(one.neg(), self.index),
               phantom_context: std::marker::PhantomData}
@@ -359,31 +311,31 @@ impl <InternalFloat, CT> std::ops::Neg for Float<InternalFloat, CT> where Intern
 
 // TODO adjoints of 1 can be optimized out, i.e., not multiplying. Should we?
 // TODO implement operations with underlying type.
-impl <InternalFloat, CT> std::ops::Add<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Add<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn add(self, other: Float<InternalFloat, CT>) -> Float<InternalFloat, CT> {
         Float{value: self.value + other.value,
               index: <CT as super::context::ContextCratePrivate<InternalFloat>>::binary_operation(
-                  &[std::num::Float::one(), std::num::Float::one()],
+                  &[num::traits::One::one(), num::traits::One::one()],
                   &[self.index, other.index]),
               phantom_context: std::marker::PhantomData}
     }
 }
 
-impl <InternalFloat, CT> std::ops::Add<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Add<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn add(self, other: InternalFloat) -> Float<InternalFloat, CT> {
         Float{value: self.value + other,
               index: <CT as super::context::ContextCratePrivate<InternalFloat>>::unary_operation(
-                  std::num::Float::one(), self.index),
+                  num::traits::One::one(), self.index),
               phantom_context: std::marker::PhantomData}
     }
 }
 
-impl <InternalFloat, CT> std::ops::Sub<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Sub<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn sub(self, other: Float<InternalFloat, CT>) -> Float<InternalFloat, CT> {
-        let one: InternalFloat = std::num::Float::one();
+        let one: InternalFloat = num::traits::One::one();
         Float{value: self.value - other.value,
               index: <CT as super::context::ContextCratePrivate<InternalFloat>>::binary_operation(
                   &[one, -one],
@@ -392,17 +344,17 @@ impl <InternalFloat, CT> std::ops::Sub<Float<InternalFloat, CT>> for Float<Inter
     }
 }
 
-impl <InternalFloat, CT> std::ops::Sub<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Sub<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn sub(self, other: InternalFloat) -> Float<InternalFloat, CT> {
         Float{value: self.value - other,
               index: <CT as super::context::ContextCratePrivate<InternalFloat>>::unary_operation(
-                  std::num::Float::one(), self.index),
+                  num::traits::One::one(), self.index),
               phantom_context: std::marker::PhantomData}
     }
 }
 
-impl <InternalFloat, CT> std::ops::Mul<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Mul<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn mul(self, other: Float<InternalFloat, CT>) -> Float<InternalFloat, CT> {
         Float{value: self.value * other.value,
@@ -413,7 +365,7 @@ impl <InternalFloat, CT> std::ops::Mul<Float<InternalFloat, CT>> for Float<Inter
     }
 }
 
-impl <InternalFloat, CT> std::ops::Mul<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Mul<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn mul(self, other: InternalFloat) -> Float<InternalFloat, CT> {
         Float{value: self.value * other,
@@ -423,7 +375,7 @@ impl <InternalFloat, CT> std::ops::Mul<InternalFloat> for Float<InternalFloat, C
     }
 }
 
-impl <InternalFloat, CT> std::ops::Div<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Div<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn div(self, other: Float<InternalFloat, CT>) -> Float<InternalFloat, CT> {
         Float{value: self.value / other.value,
@@ -434,7 +386,7 @@ impl <InternalFloat, CT> std::ops::Div<Float<InternalFloat, CT>> for Float<Inter
     }
 }
 
-impl <InternalFloat, CT> std::ops::Div<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Div<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn div(self, other: InternalFloat) -> Float<InternalFloat, CT> {
         Float{value: self.value / other,
@@ -446,7 +398,7 @@ impl <InternalFloat, CT> std::ops::Div<InternalFloat> for Float<InternalFloat, C
 
 // TODO 1. Does it make sense to support % operator between two Floats ?
 //      2. If so, should we record other even though the multiplier is 0?
-impl <InternalFloat, CT> std::ops::Rem<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Rem<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn rem(self, other: Float<InternalFloat, CT>) -> Float<InternalFloat, CT> {
         // TODO add this kind of assert everywhere.
@@ -455,18 +407,18 @@ impl <InternalFloat, CT> std::ops::Rem<Float<InternalFloat, CT>> for Float<Inter
         //         other . context as * const super::context::Context < InternalFloat > ));
         Float{value: self.value % other.value,
               index: <CT as super::context::ContextCratePrivate<InternalFloat>>::binary_operation(
-                  &[std::num::Float::one(), std::num::Float::zero()],
+                  &[num::traits::One::one(), num::traits::Zero::zero()],
                   &[self.index, other.index]),
               phantom_context: std::marker::PhantomData}
     }
 }
 
-impl <InternalFloat, CT> std::ops::Rem<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::ops::Rem<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn rem(self, other: InternalFloat) -> Float<InternalFloat, CT> {
         Float{value: self.value % other,
               index: <CT as super::context::ContextCratePrivate<InternalFloat>>::unary_operation(
-                  std::num::Float::one(), self.index),
+                  num::traits::One::one(), self.index),
               phantom_context: std::marker::PhantomData}
     }
 }
@@ -485,7 +437,7 @@ macro_rules! impl_std_ops {
             fn sub(self, other: Float<$InternalFloat, CT>) -> Float<$InternalFloat, CT> {
                 Float{value: self - other.value,
                       index: <CT as super::context::ContextCratePrivate<$InternalFloat>>::unary_operation(
-                          -<$InternalFloat as std::num::Float>::one(), other.index),
+                          -<$InternalFloat as num::One>::one(), other.index),
                       phantom_context: std::marker::PhantomData}
             }
         }
@@ -503,7 +455,7 @@ macro_rules! impl_std_ops {
                 // TODO I had to use the following block to avoid Float naming conflict. Is there a better way?
                 let adjoint : $InternalFloat;
                 {
-                    use std::num::Float;
+                    use num::Float;
                     adjoint = -((other.value * other.value).recip());
                 }
                 Float{value: self / other.value,
@@ -527,25 +479,25 @@ macro_rules! impl_std_ops {
 impl_std_ops!(f32);
 impl_std_ops!(f64);
 
-impl <InternalFloat, CT> std::cmp::PartialEq for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::cmp::PartialEq for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     fn eq(&self, other: &Float<InternalFloat, CT>) -> bool { self.value == other.value }
 }
 
-impl <InternalFloat, CT> std::cmp::PartialOrd for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::cmp::PartialOrd for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     fn partial_cmp(&self, other: &Float<InternalFloat, CT>) -> Option<std::cmp::Ordering> {
         self.value.partial_cmp(&other.value)
     }
 }
 
-impl <InternalFloat, CT> std::marker::Copy for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> std::marker::Copy for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
 }
 
-pub trait FloatCratePrivate<InternalFloat, CT> : std::marker::PhantomFn<CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+pub trait FloatCratePrivate<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     fn new(value: InternalFloat, index: usize) ->Self;
     fn float_get_index(&self) -> usize;
 }
 
-impl <InternalFloat, CT> FloatCratePrivate<InternalFloat, CT> for Float<InternalFloat, CT> where InternalFloat: std::num::Float, CT: super::context::Context<InternalFloat> {
+impl <InternalFloat, CT> FloatCratePrivate<InternalFloat, CT> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     fn new(value: InternalFloat, index: usize) -> Self {
         Float{value: value, index: index, phantom_context: std::marker::PhantomData}
     }

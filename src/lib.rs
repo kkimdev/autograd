@@ -17,8 +17,8 @@
 #![crate_type = "rlib"]
 
 #![feature(thread_local)]
-#![feature(std_misc)]
-#![feature(core)]
+
+extern crate num;
 
 mod context;
 mod float;

@@ -5,11 +5,12 @@
 #![feature(std_misc)]
 #![feature(alloc)]
 
+extern crate num;
 #[macro_use]
 extern crate autograd;
 
 use autograd::Context;
-use std::num::Float;
+use num::Float;
 use std::ops::Neg;
 
 macro_rules! unary_operation_test {

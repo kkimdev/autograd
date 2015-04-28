@@ -14,3 +14,6 @@ authors = ["Kibeom Kim <kk1674@nyu.edu>"]
 name = "autograd_bin"
 test = false
 doc = false
+
+[dependencies]
+num = "*"

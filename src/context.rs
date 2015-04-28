@@ -4,13 +4,13 @@
 
 //! this is context class to use autograd.
 
-extern crate std;
-
+use num;
+use std;
 use super::float::FloatCratePrivate;
 
 // TODO #[inline] where appropriate.
 
-pub trait Context<InternalFloat>: ContextCratePrivate<InternalFloat> + std::marker::Sized where InternalFloat: std::num::Float {
+pub trait Context<InternalFloat>: ContextCratePrivate<InternalFloat> + std::marker::Sized where InternalFloat: num::Float {
     // public functions
 
     fn new_variable(&self, value: InternalFloat) -> super::float::Float<InternalFloat, Self> {
@@ -25,10 +25,10 @@ pub trait Context<InternalFloat>: ContextCratePrivate<InternalFloat> + std::mark
                 *<Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count(), self.capacity());
 
             for i in (0..(*<Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count())) {
-                *<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(i as isize) = std::num::Float::zero();
+                *<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(i as isize) = num::traits::Zero::zero();
             }
 
-            *<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(float.float_get_index() as isize) = std::num::Float::one();
+            *<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(float.float_get_index() as isize) = num::traits::One::one();
             for i in (0..(*<Self as ContextModulePrivate<InternalFloat>>::get_recorded_entries_count())).rev() {
                 let lhs_index = *<Self as ContextModulePrivate<InternalFloat>>::get_lhs_indices().offset(i as isize);
                 let rhs_index = *<Self as ContextModulePrivate<InternalFloat>>::get_rhs_indices().offset(i as isize);
@@ -48,7 +48,7 @@ pub trait Context<InternalFloat>: ContextCratePrivate<InternalFloat> + std::mark
     }
 }
 
-pub trait ContextCratePrivate<InternalFloat>: ContextModulePrivate<InternalFloat> where InternalFloat: std::num::Float {
+pub trait ContextCratePrivate<InternalFloat>: ContextModulePrivate<InternalFloat> where InternalFloat: num::Float {
     fn unary_operation(adjoint: InternalFloat, rhs_index: usize) -> usize {
         let lhs_index = <Self as ContextModulePrivate<InternalFloat>>::get_new_variable_index();
         let recorded_entries_count_offset = <Self as ContextModulePrivate<InternalFloat>>::get_new_entry_index() as isize;
@@ -80,7 +80,7 @@ pub trait ContextCratePrivate<InternalFloat>: ContextModulePrivate<InternalFloat
     }
 }
 
-pub trait ContextModulePrivate<InternalFloat> where InternalFloat: std::num::Float {
+pub trait ContextModulePrivate<InternalFloat> where InternalFloat: num::Float {
     fn get_new_variable_index() -> usize {
         let count = <Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count();
         let index = *count;
@@ -112,7 +112,7 @@ macro_rules! new_autograd_context {
         {
             struct ContextImpl {
                 capacity: usize,
-                _mutex_guard: std::sync::MutexGuard<'static ()>,
+                _mutex_guard: std::sync::MutexGuard<'static, ()>,
             }
 
             impl $crate::Context<$InternalFloat> for ContextImpl {

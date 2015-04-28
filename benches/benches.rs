@@ -5,15 +5,16 @@
 #![feature(std_misc)]
 #![feature(alloc)]
 #![feature(test)]
-#![feature(core)]
+#![feature(convert)]
 
+extern crate num;
 extern crate test;
 #[macro_use]
 extern crate autograd;
 
 static BENCH_SIZE : usize = 1024;
 
-fn norm<T>(inputs: &[T]) -> T where T : std::num::Float {
+fn norm<T>(inputs: &[T]) -> T where T : num::Float {
     let mut inputs_iter = inputs.iter();
     let first_input = *inputs_iter.next().unwrap();
     let mut sum = first_input * first_input;
@@ -26,7 +27,7 @@ fn norm<T>(inputs: &[T]) -> T where T : std::num::Float {
 #[bench]
 fn compute_norm_f32(bencher: &mut test::Bencher) {
     bencher.iter(|| {
-        use std::num::Float;
+        use num::Float;
 
         let mut x = Vec::<f32>::with_capacity(8 * BENCH_SIZE);
 
@@ -43,7 +44,7 @@ fn compute_norm_f32(bencher: &mut test::Bencher) {
 #[bench]
 fn compute_norm_autograd_f32(bencher: &mut test::Bencher) {
     bencher.iter(|| {
-        use std::num::Float;
+        use num::Float;
         use autograd::Context;
 
         let context = new_autograd_context!(f32, 8 * BENCH_SIZE);
