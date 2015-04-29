@@ -6,7 +6,7 @@
 
 use num;
 use std;
-use super::float::FloatCratePrivate;
+
 
 // TODO #[inline] where appropriate.
 
@@ -14,67 +14,73 @@ pub trait Context<InternalFloat>: ContextCratePrivate<InternalFloat> + std::mark
     // public functions
 
     fn new_variable(&self, value: InternalFloat) -> super::float::Float<InternalFloat, Self> {
-        FloatCratePrivate::new(value, <Self as ContextModulePrivate<InternalFloat>>::get_new_variable_index())
+        use super::float::FloatCratePrivate;
+
+        FloatCratePrivate::new(value, Self::get_new_variable_index())
     }
 
     fn differentiate(&self, float: super::float::Float<InternalFloat, Self>) {
+        use super::float::FloatCratePrivate;
+
         // TODO The current implementation is not performant and dirty.
         unsafe {
-            assert!(*<Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count() <= self.capacity(),
+            assert!(*Self::get_recorded_variables_count() <= self.capacity(),
                 "There are more recorded variables, {}, than its capacity, {}. Memory is corrupted. Please consider using bigger capacity.",
-                *<Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count(), self.capacity());
+                *Self::get_recorded_variables_count(), self.capacity());
 
-            for i in (0..(*<Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count())) {
-                *<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(i as isize) = num::traits::Zero::zero();
+            for i in (0..(*Self::get_recorded_variables_count())) {
+                *Self::get_result_derivatives().offset(i as isize) = num::traits::Zero::zero();
             }
 
-            *<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(float.float_get_index() as isize) = num::traits::One::one();
-            for i in (0..(*<Self as ContextModulePrivate<InternalFloat>>::get_recorded_entries_count())).rev() {
-                let lhs_index = *<Self as ContextModulePrivate<InternalFloat>>::get_lhs_indices().offset(i as isize);
-                let rhs_index = *<Self as ContextModulePrivate<InternalFloat>>::get_rhs_indices().offset(i as isize);
-                *<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(rhs_index as isize) =
-                    *<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(rhs_index as isize)
-                    + (*<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(lhs_index as isize)
-                       * *<Self as ContextModulePrivate<InternalFloat>>::get_adjoints().offset(i as isize));
+            *Self::get_result_derivatives().offset(float.float_get_index() as isize) = num::traits::One::one();
+            for i in (0..(*Self::get_recorded_entries_count())).rev() {
+                let lhs_index = *Self::get_lhs_indices().offset(i as isize);
+                let rhs_index = *Self::get_rhs_indices().offset(i as isize);
+                *Self::get_result_derivatives().offset(rhs_index as isize) =
+                    *Self::get_result_derivatives().offset(rhs_index as isize)
+                    + (*Self::get_result_derivatives().offset(lhs_index as isize)
+                       * *Self::get_adjoints().offset(i as isize));
             }
         }
     }
 
     fn get_derivative(&self, float: super::float::Float<InternalFloat, Self>) -> InternalFloat {
+        use super::float::FloatCratePrivate;
+
         let float_index_offset = float.float_get_index() as isize;
         unsafe {
-            *<Self as ContextModulePrivate<InternalFloat>>::get_result_derivatives().offset(float_index_offset)
+            *Self::get_result_derivatives().offset(float_index_offset)
         }
     }
 }
 
 pub trait ContextCratePrivate<InternalFloat>: ContextModulePrivate<InternalFloat> where InternalFloat: num::Float {
     fn unary_operation(adjoint: InternalFloat, rhs_index: usize) -> usize {
-        let lhs_index = <Self as ContextModulePrivate<InternalFloat>>::get_new_variable_index();
-        let recorded_entries_count_offset = <Self as ContextModulePrivate<InternalFloat>>::get_new_entry_index() as isize;
+        let lhs_index = Self::get_new_variable_index();
+        let recorded_entries_count_offset = Self::get_new_entry_index() as isize;
         unsafe {
-            *<Self as ContextModulePrivate<InternalFloat>>::get_adjoints().offset(recorded_entries_count_offset) = adjoint;
-            *<Self as ContextModulePrivate<InternalFloat>>::get_lhs_indices().offset(recorded_entries_count_offset) = lhs_index;
-            *<Self as ContextModulePrivate<InternalFloat>>::get_rhs_indices().offset(recorded_entries_count_offset) = rhs_index;
+            *Self::get_adjoints().offset(recorded_entries_count_offset) = adjoint;
+            *Self::get_lhs_indices().offset(recorded_entries_count_offset) = lhs_index;
+            *Self::get_rhs_indices().offset(recorded_entries_count_offset) = rhs_index;
         }
         lhs_index
     }
 
     fn binary_operation(adjoints: &[InternalFloat; 2],
                         rhs_indices: &[usize; 2]) -> usize {
-        let lhs_index = <Self as ContextModulePrivate<InternalFloat>>::get_new_variable_index();
-        let recorded_entries_count_offset_1 = <Self as ContextModulePrivate<InternalFloat>>::get_new_entry_index() as isize;
-        let recorded_entries_count_offset_2 = <Self as ContextModulePrivate<InternalFloat>>::get_new_entry_index() as isize;
+        let lhs_index = Self::get_new_variable_index();
+        let recorded_entries_count_offset_1 = Self::get_new_entry_index() as isize;
+        let recorded_entries_count_offset_2 = Self::get_new_entry_index() as isize;
 
         unsafe {
             // TODO is indexing inefficient?
-            *<Self as ContextModulePrivate<InternalFloat>>::get_adjoints().offset(recorded_entries_count_offset_1) = adjoints[0];
-            *<Self as ContextModulePrivate<InternalFloat>>::get_lhs_indices().offset(recorded_entries_count_offset_1) = lhs_index;
-            *<Self as ContextModulePrivate<InternalFloat>>::get_rhs_indices().offset(recorded_entries_count_offset_1) = rhs_indices[0];
+            *Self::get_adjoints().offset(recorded_entries_count_offset_1) = adjoints[0];
+            *Self::get_lhs_indices().offset(recorded_entries_count_offset_1) = lhs_index;
+            *Self::get_rhs_indices().offset(recorded_entries_count_offset_1) = rhs_indices[0];
 
-            *<Self as ContextModulePrivate<InternalFloat>>::get_adjoints().offset(recorded_entries_count_offset_2) = adjoints[1];
-            *<Self as ContextModulePrivate<InternalFloat>>::get_lhs_indices().offset(recorded_entries_count_offset_2) = lhs_index;
-            *<Self as ContextModulePrivate<InternalFloat>>::get_rhs_indices().offset(recorded_entries_count_offset_2) = rhs_indices[1];
+            *Self::get_adjoints().offset(recorded_entries_count_offset_2) = adjoints[1];
+            *Self::get_lhs_indices().offset(recorded_entries_count_offset_2) = lhs_index;
+            *Self::get_rhs_indices().offset(recorded_entries_count_offset_2) = rhs_indices[1];
         }
         lhs_index
     }
@@ -82,14 +88,14 @@ pub trait ContextCratePrivate<InternalFloat>: ContextModulePrivate<InternalFloat
 
 pub trait ContextModulePrivate<InternalFloat> where InternalFloat: num::Float {
     fn get_new_variable_index() -> usize {
-        let count = <Self as ContextModulePrivate<InternalFloat>>::get_recorded_variables_count();
+        let count = Self::get_recorded_variables_count();
         let index = *count;
         *count += 1;
         index
     }
 
     fn get_new_entry_index() -> usize {
-        let count = <Self as ContextModulePrivate<InternalFloat>>::get_recorded_entries_count();
+        let count = Self::get_recorded_entries_count();
         let index = *count;
         *count += 1;
         index
@@ -190,13 +196,15 @@ macro_rules! new_autograd_context {
                     // std::rt::heap::allocate(t_size, mem::min_align_of::<InternalFloat>())
 
                     unsafe {
-                        *<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_recorded_variables_count() = 0;
-                        *<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_recorded_entries_count() = 0;
-                        *<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_adjoints() = std::rt::heap::allocate(t_size, std::mem::align_of::<$InternalFloat>()) as *mut $InternalFloat;
-                        *<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_lhs_indices() = std::rt::heap::allocate(usize_size, std::mem::align_of::<usize>()) as *mut usize;
-                        *<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_rhs_indices() = std::rt::heap::allocate(usize_size, std::mem::align_of::<usize>()) as *mut usize;
+                        use $crate::ContextModulePrivate;
+
+                        *Self::get_recorded_variables_count() = 0;
+                        *Self::get_recorded_entries_count() = 0;
+                        *Self::get_adjoints() = std::rt::heap::allocate(t_size, std::mem::align_of::<$InternalFloat>()) as *mut $InternalFloat;
+                        *Self::get_lhs_indices() = std::rt::heap::allocate(usize_size, std::mem::align_of::<usize>()) as *mut usize;
+                        *Self::get_rhs_indices() = std::rt::heap::allocate(usize_size, std::mem::align_of::<usize>()) as *mut usize;
                         // TODO we don't have to allocate get_result_derivatives now, isn't it?
-                        *<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_result_derivatives() = std::rt::heap::allocate(t_size, std::mem::align_of::<$InternalFloat>()) as *mut $InternalFloat;
+                        *Self::get_result_derivatives() = std::rt::heap::allocate(t_size, std::mem::align_of::<$InternalFloat>()) as *mut $InternalFloat;
                     }
                     context
                 }
@@ -204,10 +212,12 @@ macro_rules! new_autograd_context {
 
             impl std::ops::Drop for ContextImpl {
                 fn drop(&mut self) {
+                    use $crate::ContextModulePrivate;
+
                     // TODO Ideally we should detect overflow at the time it overflows. Similar to stack overflow problem. mprotect?
-                    assert!(*<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_recorded_variables_count() <= ($crate::ContextModulePrivate::<$InternalFloat>::capacity(self)),
+                    assert!(*Self::get_recorded_variables_count() <= (ContextModulePrivate::<$InternalFloat>::capacity(self)),
                         "There are more recorded variables, {}, than its capacity, {}. Memory is corrupted. Please consider using bigger capacity.",
-                        *<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_recorded_variables_count(), ($crate::ContextModulePrivate::<$InternalFloat>::capacity(self)));
+                        *Self::get_recorded_variables_count(), (ContextModulePrivate::<$InternalFloat>::capacity(self)));
 
                     // TODO Do we want to reset these?
                     // *Context::<$InternalFloat>::get_recorded_variables_count(None::<Self>) = 0;
@@ -217,10 +227,10 @@ macro_rules! new_autograd_context {
                     let t_size = self.capacity * std::mem::size_of::<$InternalFloat>();
 
                     unsafe {
-                        std::rt::heap::deallocate(*<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_adjoints() as *mut u8, t_size, std::mem::align_of::<$InternalFloat>());
-                        std::rt::heap::deallocate(*<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_lhs_indices() as *mut u8, usize_size, std::mem::align_of::<usize>());
-                        std::rt::heap::deallocate(*<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_rhs_indices() as *mut u8, usize_size, std::mem::align_of::<usize>());
-                        std::rt::heap::deallocate(*<Self as $crate::ContextModulePrivate<$InternalFloat>>::get_result_derivatives() as *mut u8, t_size, std::mem::align_of::<$InternalFloat>());
+                        std::rt::heap::deallocate(*Self::get_adjoints() as *mut u8, t_size, std::mem::align_of::<$InternalFloat>());
+                        std::rt::heap::deallocate(*Self::get_lhs_indices() as *mut u8, usize_size, std::mem::align_of::<usize>());
+                        std::rt::heap::deallocate(*Self::get_rhs_indices() as *mut u8, usize_size, std::mem::align_of::<usize>());
+                        std::rt::heap::deallocate(*Self::get_result_derivatives() as *mut u8, t_size, std::mem::align_of::<$InternalFloat>());
                     }
                 }
             }
