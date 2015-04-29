@@ -13,6 +13,9 @@
 
 // TODO Add Valgrind, ASAN, and TSAN tests.
 
+// TODO Repect Rust column wrapping guide.
+//      https://github.com/rust-lang/rust-guidelines/blob/master/style/whitespace.md
+
 #![crate_name = "autograd"]
 #![crate_type = "rlib"]
 
