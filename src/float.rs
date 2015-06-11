@@ -39,6 +39,10 @@ impl <InternalFloat, CT> num::Float for Float<InternalFloat, CT> where InternalF
         unimplemented!();
     }
 
+    fn min_positive_value() -> Self {
+        unimplemented!();
+    }
+
     fn is_nan(self) -> bool {
         self.value.is_nan()
     }
