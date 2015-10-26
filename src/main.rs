@@ -1,5 +1,5 @@
-/* Any copyright is dedicated to the Public Domain.
- * http://creativecommons.org/publicdomain/zero/1.0/ */
+// Any copyright is dedicated to the Public Domain.
+// http://creativecommons.org/publicdomain/zero/1.0/
 
 #![feature(thread_local)]
 #![feature(std_misc)]
@@ -28,8 +28,8 @@ fn main() {
     println!("dx2 == {}", context.get_derivative(x2));
 }
 
-/* Output
-y   == 9.5
-dx1 == 3
-dx2 == 1.5
-*/
+// Output
+// y   == 9.5
+// dx1 == 3
+// dx2 == 1.5
+//

@@ -1,10 +1,10 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-/*!
-# Autogard
-*/
+// !
+// # Autogard
+//
 
 // TODO Using expression template will give better performance.
 //      e.g., http://www.met.reading.ac.uk/clouds/adept/
@@ -14,7 +14,8 @@
 // TODO Add Valgrind, ASAN, and TSAN tests.
 
 // TODO Repect Rust column wrapping guide.
-//      https://github.com/rust-lang/rust-guidelines/blob/master/style/whitespace.md
+// https://github.
+// com/rust-lang/rust-guidelines/blob/master/style/whitespace.md
 
 #![crate_name = "autograd"]
 #![crate_type = "rlib"]

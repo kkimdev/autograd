@@ -1,16 +1,19 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 use num;
 use std;
 
 // TODO derive Hash?
 #[derive(Debug)]
-pub struct Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
+pub struct Float<InternalFloat, CT>
+    where InternalFloat: num::Float,
+          CT: super::context::Context<InternalFloat>
+{
     pub value: InternalFloat,
     index: usize,
-    phantom_context: std::marker::PhantomData<CT>
+    phantom_context: std::marker::PhantomData<CT>,
 }
 
 // TODO implement num::Float
@@ -121,16 +124,20 @@ impl <InternalFloat, CT> num::Float for Float<InternalFloat, CT> where InternalF
     fn sqrt(self) -> Self {
         let two = InternalFloat::one() + InternalFloat::one();
         let sqrt_value = self.value.sqrt();
-        Float{value: sqrt_value,
-              index: CT::unary_operation((two * sqrt_value).recip(), self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: sqrt_value,
+            index: CT::unary_operation((two * sqrt_value).recip(), self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 
     fn exp(self) -> Self {
         let exp_value = self.value.exp();
-        Float{value: exp_value,
-              index: CT::unary_operation(exp_value, self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: exp_value,
+            index: CT::unary_operation(exp_value, self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 
     fn exp2(self) -> Self {
@@ -179,15 +186,19 @@ impl <InternalFloat, CT> num::Float for Float<InternalFloat, CT> where InternalF
     }
 
     fn sin(self) -> Self {
-        Float{value: self.value.sin(),
-              index: CT::unary_operation(self.value.cos(), self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value.sin(),
+            index: CT::unary_operation(self.value.cos(), self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 
     fn cos(self) -> Self {
-        Float{value: self.value.cos(),
-              index: CT::unary_operation(-self.value.sin(), self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value.cos(),
+            index: CT::unary_operation(-self.value.sin(), self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 
     fn tan(self) -> Self {
@@ -278,21 +289,31 @@ impl <InternalFloat, CT> num::Num for Float<InternalFloat, CT> where InternalFlo
 
 impl <InternalFloat, CT> std::clone::Clone for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     fn clone(&self) -> Self {
-        Float{value: self.value, index: self.index, phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value,
+            index: self.index,
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
 
 impl <InternalFloat, CT> num::ToPrimitive for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
-    fn to_i64(&self) -> Option<i64> { self.value.to_i64() }
+    fn to_i64(&self) -> Option<i64> {
+        self.value.to_i64()
+    }
 
-    fn to_u64(&self) -> Option<u64> { self.value.to_u64() }
-    //TODO implement the rest optional function.
+    fn to_u64(&self) -> Option<u64> {
+        self.value.to_u64()
+    }
+// TODO implement the rest optional function.
 }
 
 impl <InternalFloat, CT> num::NumCast for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     #[allow(unused_variables)]
-    fn from<TP>(n: TP) -> Option<Self> where TP: num::ToPrimitive {
+    fn from<TP>(n: TP) -> Option<Self>
+        where TP: num::ToPrimitive
+    {
         panic!("We disallow constructing from a constant because it is unnecessary.");
     }
 }
@@ -300,9 +321,11 @@ impl <InternalFloat, CT> num::NumCast for Float<InternalFloat, CT> where Interna
 impl <InternalFloat, CT> std::ops::Neg for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn neg(self) -> Float<InternalFloat, CT> {
-        Float{value: -self.value,
-              index: CT::unary_operation(InternalFloat::one().neg(), self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: -self.value,
+            index: CT::unary_operation(InternalFloat::one().neg(), self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
@@ -311,20 +334,23 @@ impl <InternalFloat, CT> std::ops::Neg for Float<InternalFloat, CT> where Intern
 impl <InternalFloat, CT> std::ops::Add<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn add(self, other: Float<InternalFloat, CT>) -> Float<InternalFloat, CT> {
-        Float{value: self.value + other.value,
-              index: CT::binary_operation(
-                  &[num::One::one(), num::One::one()],
-                  &[self.index, other.index]),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value + other.value,
+            index: CT::binary_operation(&[num::One::one(), num::One::one()],
+                                        &[self.index, other.index]),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
 impl <InternalFloat, CT> std::ops::Add<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn add(self, other: InternalFloat) -> Float<InternalFloat, CT> {
-        Float{value: self.value + other,
-              index: CT::unary_operation(num::One::one(), self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value + other,
+            index: CT::unary_operation(num::One::one(), self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
@@ -332,58 +358,68 @@ impl <InternalFloat, CT> std::ops::Sub<Float<InternalFloat, CT>> for Float<Inter
     type Output = Float<InternalFloat, CT>;
     fn sub(self, other: Float<InternalFloat, CT>) -> Float<InternalFloat, CT> {
         let one: InternalFloat = num::One::one();
-        Float{value: self.value - other.value,
-              index: CT::binary_operation(&[one, -one], &[self.index, other.index]),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value - other.value,
+            index: CT::binary_operation(&[one, -one], &[self.index, other.index]),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
 impl <InternalFloat, CT> std::ops::Sub<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn sub(self, other: InternalFloat) -> Float<InternalFloat, CT> {
-        Float{value: self.value - other,
-              index: CT::unary_operation(num::One::one(), self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value - other,
+            index: CT::unary_operation(num::One::one(), self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
 impl <InternalFloat, CT> std::ops::Mul<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn mul(self, other: Float<InternalFloat, CT>) -> Float<InternalFloat, CT> {
-        Float{value: self.value * other.value,
-              index: CT::binary_operation(
-                  &[other.value, self.value],
-                  &[self.index, other.index]),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value * other.value,
+            index: CT::binary_operation(&[other.value, self.value], &[self.index, other.index]),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
 impl <InternalFloat, CT> std::ops::Mul<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn mul(self, other: InternalFloat) -> Float<InternalFloat, CT> {
-        Float{value: self.value * other,
-              index: CT::unary_operation(other, self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value * other,
+            index: CT::unary_operation(other, self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
 impl <InternalFloat, CT> std::ops::Div<Float<InternalFloat, CT>> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn div(self, other: Float<InternalFloat, CT>) -> Float<InternalFloat, CT> {
-        Float{value: self.value / other.value,
-              index: CT::binary_operation(
-                  &[other.value.recip(), -((self.value * self.value).recip())],
-                  &[self.index, other.index]),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value / other.value,
+            index: CT::binary_operation(&[other.value.recip(),
+                                          -((self.value * self.value).recip())],
+                                        &[self.index, other.index]),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
 impl <InternalFloat, CT> std::ops::Div<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn div(self, other: InternalFloat) -> Float<InternalFloat, CT> {
-        Float{value: self.value / other,
-              index: CT::unary_operation(other.recip(), self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value / other,
+            index: CT::unary_operation(other.recip(), self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
@@ -395,21 +431,25 @@ impl <InternalFloat, CT> std::ops::Rem<Float<InternalFloat, CT>> for Float<Inter
         // TODO add this kind of assert everywhere.
         // assert!(( self . context as * const super::context::Context < InternalFloat >
         //         ) == (
-        //         other . context as * const super::context::Context < InternalFloat > ));
-        Float{value: self.value % other.value,
-              index: CT::binary_operation(
-                  &[num::One::one(), num::Zero::zero()],
-                  &[self.index, other.index]),
-              phantom_context: std::marker::PhantomData}
+        // other . context as * const super::context::Context < InternalFloat >
+        // ));
+        Float {
+            value: self.value % other.value,
+            index: CT::binary_operation(&[num::One::one(), num::Zero::zero()],
+                                        &[self.index, other.index]),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
 impl <InternalFloat, CT> std::ops::Rem<InternalFloat> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     type Output = Float<InternalFloat, CT>;
     fn rem(self, other: InternalFloat) -> Float<InternalFloat, CT> {
-        Float{value: self.value % other,
-              index: CT::unary_operation(num::One::one(), self.index),
-              phantom_context: std::marker::PhantomData}
+        Float {
+            value: self.value % other,
+            index: CT::unary_operation(num::One::one(), self.index),
+            phantom_context: std::marker::PhantomData,
+        }
     }
 }
 
@@ -459,12 +499,16 @@ macro_rules! impl_std_ops {
     )
 }
 
-// TODO We shouldn't hard code f32 and f64. Or at least, users should be able to implement this for their choice of Float type without modifying this library.
+// TODO We shouldn't hard code f32 and f64. Or at least, users should be able
+// to implement this for their choice of Float type without modifying this
+// library.
 impl_std_ops!(f32);
 impl_std_ops!(f64);
 
 impl <InternalFloat, CT> std::cmp::PartialEq for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
-    fn eq(&self, other: &Float<InternalFloat, CT>) -> bool { self.value == other.value }
+    fn eq(&self, other: &Float<InternalFloat, CT>) -> bool {
+        self.value == other.value
+    }
 }
 
 impl <InternalFloat, CT> std::cmp::PartialOrd for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
@@ -477,13 +521,17 @@ impl <InternalFloat, CT> std::marker::Copy for Float<InternalFloat, CT> where In
 }
 
 pub trait FloatCratePrivate<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
-    fn new(value: InternalFloat, index: usize) ->Self;
+    fn new(value: InternalFloat, index: usize) -> Self;
     fn float_get_index(&self) -> usize;
 }
 
 impl <InternalFloat, CT> FloatCratePrivate<InternalFloat, CT> for Float<InternalFloat, CT> where InternalFloat: num::Float, CT: super::context::Context<InternalFloat> {
     fn new(value: InternalFloat, index: usize) -> Self {
-        Float{value: value, index: index, phantom_context: std::marker::PhantomData}
+        Float {
+            value: value,
+            index: index,
+            phantom_context: std::marker::PhantomData,
+        }
     }
 
     fn float_get_index(&self) -> usize {

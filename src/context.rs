@@ -1,6 +1,6 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 //! this is context class to use autograd.
 
@@ -25,21 +25,24 @@ pub trait Context<InternalFloat>: ContextCratePrivate<InternalFloat> + std::mark
         // TODO The current implementation is not performant and dirty.
         unsafe {
             assert!(*Self::get_recorded_variables_count() <= self.capacity(),
-                "There are more recorded variables, {}, than its capacity, {}. Memory is corrupted. Please consider using bigger capacity.",
-                *Self::get_recorded_variables_count(), self.capacity());
+                    "There are more recorded variables, {}, than its capacity, {}. Memory is \
+                     corrupted. Please consider using bigger capacity.",
+                    *Self::get_recorded_variables_count(),
+                    self.capacity());
 
             for i in (0..(*Self::get_recorded_variables_count())) {
                 *Self::get_result_derivatives().offset(i as isize) = num::traits::Zero::zero();
             }
 
-            *Self::get_result_derivatives().offset(float.float_get_index() as isize) = num::traits::One::one();
+            *Self::get_result_derivatives().offset(float.float_get_index() as isize) =
+                num::traits::One::one();
             for i in (0..(*Self::get_recorded_entries_count())).rev() {
                 let lhs_index = *Self::get_lhs_indices().offset(i as isize);
                 let rhs_index = *Self::get_rhs_indices().offset(i as isize);
                 *Self::get_result_derivatives().offset(rhs_index as isize) =
-                    *Self::get_result_derivatives().offset(rhs_index as isize)
-                    + (*Self::get_result_derivatives().offset(lhs_index as isize)
-                       * *Self::get_adjoints().offset(i as isize));
+                    *Self::get_result_derivatives().offset(rhs_index as isize) +
+                    (*Self::get_result_derivatives().offset(lhs_index as isize) *
+                     *Self::get_adjoints().offset(i as isize));
             }
         }
     }
@@ -48,9 +51,7 @@ pub trait Context<InternalFloat>: ContextCratePrivate<InternalFloat> + std::mark
         use super::float::FloatCratePrivate;
 
         let float_index_offset = float.float_get_index() as isize;
-        unsafe {
-            *Self::get_result_derivatives().offset(float_index_offset)
-        }
+        unsafe { *Self::get_result_derivatives().offset(float_index_offset) }
     }
 }
 
@@ -66,8 +67,7 @@ pub trait ContextCratePrivate<InternalFloat>: ContextModulePrivate<InternalFloat
         lhs_index
     }
 
-    fn binary_operation(adjoints: &[InternalFloat; 2],
-                        rhs_indices: &[usize; 2]) -> usize {
+    fn binary_operation(adjoints: &[InternalFloat; 2], rhs_indices: &[usize; 2]) -> usize {
         let lhs_index = Self::get_new_variable_index();
         let recorded_entries_count_offset_1 = Self::get_new_entry_index() as isize;
         let recorded_entries_count_offset_2 = Self::get_new_entry_index() as isize;
@@ -106,10 +106,10 @@ pub trait ContextModulePrivate<InternalFloat> where InternalFloat: num::Float {
     fn get_recorded_variables_count() -> &'static mut usize;
     fn get_recorded_entries_count() -> &'static mut usize;
     // TODO use 'static lifetime instead?
-    fn get_adjoints<'a>() -> &'a mut*mut InternalFloat;
-    fn get_lhs_indices<'a>() -> &'a mut*mut usize;
-    fn get_rhs_indices<'a>() -> &'a mut*mut usize;
-    fn get_result_derivatives<'a>() -> &'a mut*mut InternalFloat;
+    fn get_adjoints<'a>() -> &'a mut *mut InternalFloat;
+    fn get_lhs_indices<'a>() -> &'a mut *mut usize;
+    fn get_rhs_indices<'a>() -> &'a mut *mut usize;
+    fn get_result_derivatives<'a>() -> &'a mut *mut InternalFloat;
 }
 
 #[macro_export]
